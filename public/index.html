@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HoLab! 노동권 구제 에이전트</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+</head>
+<body>
+<div id="app" class="no-print">
+  <div class="disclaimer-bar">⚖️ 이 서비스는 <b>참고용 정보</b>이며 <b>법률 자문이 아닙니다</b>. 중요한 결정은 노무사·노동청과 상담하세요.</div>
+
+  <!-- ===== 시작 화면 ===== -->
+  <section id="home" class="view">
+    <div class="home-inner">
+      <div class="home-emoji">🤝</div>
+      <h1 class="home-logo">HoLab!</h1>
+      <p class="home-sub">노동권 도우미 에이전트</p>
+      <form id="homeForm" class="pill" autocomplete="off">
+        <span class="pi">🔍</span>
+        <input id="homeInput" placeholder="어떤 점이 걱정되세요? 편하게 말씀해주세요" aria-label="상담 입력">
+        <button type="submit" id="homeSend" class="pi-send hidden" aria-label="보내기">➤</button>
+        <button type="button" id="homeAttach" class="pi-clip" title="근로계약서 사진 첨부" aria-label="계약서 첨부">📎</button>
+        <input type="file" id="homeFile" accept="image/*" hidden>
+      </form>
+      <div class="examples">
+        <button class="ex" data-q="카페 알바하는데 주휴수당을 못 받는 것 같아요">주휴수당을 못 받는 것 같아요</button>
+        <button class="ex" data-q="근로계약서가 이상한 것 같은데 봐줄 수 있어요?">계약서가 이상해요</button>
+        <button class="ex" data-q="사장님이 무서워서 말도 못 하고 있어요">사장님께 말하기 무서워요</button>
+      </div>
+      <button id="skipBtn" class="skip-main" type="button">상담 없이 진행하기 &nbsp;→</button>
+      <button id="homeSample" class="linkbtn">🧪 시연용: 김민수 샘플로 시작하기</button>
+    </div>
+  </section>
+
+  <!-- ===== AI 상담 화면 ===== -->
+  <section id="chat" class="view hidden">
+    <div class="chat-wrap">
+      <div class="chat-top">
+        <button id="chatBack" class="btn">← 처음으로</button>
+        <b>🤝 HoLab! 상담</b>
+        <button id="chatSkip" class="btn">상담 없이 진행하기</button>
+      </div>
+      <div id="chatLog" class="chat-log"></div>
+      <div id="chatSug" class="chat-sug"></div>
+      <form id="chatForm" class="pill chat-pill" autocomplete="off">
+        <span class="pi">🔍</span>
+        <input id="chatInput" placeholder="이어서 말씀해 주세요" aria-label="상담 입력">
+        <button type="button" id="chatAttach" class="pi-clip" title="근로계약서 사진 첨부" aria-label="계약서 첨부">📎</button>
+        <button type="submit" id="chatSend" class="pi-send" aria-label="보내기">➤</button>
+      </form>
+      <p class="chat-note">개인정보(이름·연락처 등)는 가려진 뒤 AI에 전달돼요. 참고용 정보이며 법률 자문이 아닙니다.</p>
+    </div>
+  </section>
+
+  <!-- ===== 기존 단계별 화면 ===== -->
+  <div id="wizard" class="hidden">
+  <header class="top">
+    <div class="brand"><span class="logo">Ho<b>Lab</b>!</span><span class="tag">내가 놓쳤던, 내 노동 권리 찾기 · 노동권 구제 AI 에이전트</span></div>
+    <div class="right">
+      <button id="btnHome" class="btn ghost">← 처음으로</button>
+      <span id="aiBadge" class="badge">AI 확인 중…</span>
+      <button id="btnSample" class="btn ghost">🧪 김민수 샘플 불러오기</button>
+    </div>
+  </header>
+
+  <nav class="steps" id="steps">
+    <button data-step="1" class="active"><i>1</i>임금 계산</button>
+    <button data-step="2"><i>2</i>계약서 분석</button>
+    <button data-step="3"><i>3</i>진정서 작성</button>
+    <button data-step="4"><i>4</i>노무사 매칭</button>
+  </nav>
+
+  <main>
+    <!-- STEP 1 -->
+    <section id="step1" class="panel">
+      <h2>① 주휴수당 · 근로소득 계산</h2>
+      <p class="sub">근무 조건을 입력하면 받아야 할 임금과 미지급액을 계산합니다. (2026년 최저임금 시급 10,320원 기준)</p>
+      <div class="grid">
+        <label>시급 (원)<input id="hourly" type="number" min="0" placeholder="예: 10320"></label>
+        <label>주 소정근로시간 (시간)<input id="weekly" type="number" min="0" step="0.5" placeholder="예: 20"></label>
+        <label>근무한 기간 (개월)<input id="months" type="number" min="0" step="0.5" placeholder="예: 3"></label>
+        <label>주당 연장근로 (시간)<input id="ot" type="number" min="0" step="0.5" value="0"></label>
+        <label>주당 야간근로 22~06시 (시간)<input id="night" type="number" min="0" step="0.5" value="0"></label>
+        <label>주당 휴일근로 (시간)<input id="hol" type="number" min="0" step="0.5" value="0"></label>
+      </div>
+      <div class="checks">
+        <label class="chk"><input id="under5" type="checkbox"> 상시 근로자 5인 미만 사업장</label>
+        <label class="chk"><input id="holidayPaid" type="checkbox"> 주휴수당을 <b>받고 있음</b></label>
+        <label class="chk"><input id="extraPaid" type="checkbox"> 연장·야간·휴일 가산수당을 <b>받고 있음</b></label>
+        <label class="chk"><input id="fullAttend" type="checkbox" checked> 주 소정근로일을 개근함</label>
+      </div>
+      <button id="btnCalc" class="btn primary">계산하기</button>
+      <div id="calcResult"></div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section id="step2" class="panel hidden">
+      <h2>② 근로계약서 인식 · 분석</h2>
+      <p class="sub">사진은 <b>내 브라우저 안에서</b> 글자로 변환되고, 이름·연락처·주민번호·주소를 가린 <b>텍스트만</b> AI에 전송됩니다. 원본 사진은 밖으로 나가지 않습니다.</p>
+      <div class="tabs"><button class="tab active" data-tab="photo">📷 사진 업로드</button><button class="tab" data-tab="paste">📝 텍스트 붙여넣기</button></div>
+      <div id="tabPhoto">
+        <label class="drop"><input id="file" type="file" accept="image/*"><span>계약서 사진을 선택하세요 (밝은 곳에서 정면으로 찍은 사진)</span></label>
+        <img id="preview" class="preview hidden" alt="계약서 미리보기">
+        <div id="ocrProgress" class="progress hidden"><div id="ocrBar"></div><span id="ocrText"></span></div>
+        <div id="ocrRetry" class="warn hidden"></div>
+      </div>
+      <div id="tabPaste" class="hidden">
+        <textarea id="pasteText" rows="8" placeholder="계약서 내용을 붙여넣으세요"></textarea>
+        <button id="btnUsePaste" class="btn">이 텍스트로 진행</button>
+      </div>
+
+      <div id="maskBox" class="hidden">
+        <h3>🔒 개인정보 마스킹 결과 <small id="maskCount"></small></h3>
+        <p class="sub">아래 내용만 AI에 전송됩니다. 가려지지 않은 개인정보가 있으면 직접 고친 뒤 분석하세요.</p>
+        <textarea id="maskedText" rows="12"></textarea>
+        <button id="btnAnalyze" class="btn primary">AI로 계약서 분석하기</button>
+      </div>
+      <div id="analysisResult"></div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section id="step3" class="panel hidden">
+      <h2>③ 노동청 진정서 작성 보조</h2>
+      <p class="sub">고용노동부 <b>진정서 양식</b> 그대로 작성됩니다. 인적사항(성명·주민번호 등)은 <b>이 브라우저에만</b> 입력되며 AI에는 전송되지 않습니다. 계약서·계산 결과에서 알 수 있는 항목은 자동으로 채워집니다.</p>
+      <div id="facts" class="factsbox"></div>
+
+      <h3 class="fh">1. 진정인</h3>
+      <div class="grid g2">
+        <label>성명<input id="pName"></label>
+        <label>주민등록번호<input id="pRrn" placeholder="000000-0000000"></label>
+        <label class="wide2">주소<input id="pAddr"></label>
+        <label>전화번호<input id="pTel"></label>
+        <label>휴대전화번호<input id="pMobile"></label>
+        <label class="wide2">전자우편주소<input id="pEmail"></label>
+        <label>처리 상황 수신여부<select id="pRecv"><option>예</option><option>아니오</option></select></label>
+        <label>노동포털 통지여부<select id="pPortal"><option>예</option><option>아니오</option></select></label>
+      </div>
+
+      <h3 class="fh">2. 피진정인</h3>
+      <div class="grid g2">
+        <label>성명 (대표자)<input id="rBoss"></label>
+        <label>연락처<input id="rTel"></label>
+        <label class="wide2">주소<input id="rAddr"></label>
+        <label>사업체 구분<select id="rKind"><option>사업장</option><option>공사현장</option></select></label>
+        <label>사업장명<input id="rName"></label>
+        <label class="wide2">사업장 주소 (실근무장소)<input id="rBizAddr"></label>
+        <label>사업장 전화번호<input id="rBizTel"></label>
+        <label>근로자 수<input id="rCount" placeholder="예: 7명"></label>
+      </div>
+
+      <h3 class="fh">3. 진정 내용</h3>
+      <div class="grid g2">
+        <label>입사일<input id="startDate" type="date"></label>
+        <label>퇴사일 (재직 중이면 비움)<input id="endDate" type="date"></label>
+        <label>체불임금 총액<input id="wageTotal"></label>
+        <label>퇴직 여부<select id="retired"><option>재직</option><option>퇴직</option></select></label>
+        <label>체불퇴직금액<input id="retireAmt" placeholder="없으면 비움"></label>
+        <label>기타 체불금액<input id="etcAmt"></label>
+        <label class="wide2">업무내용<input id="duty"></label>
+        <label>임금 지급일<input id="payDay"></label>
+        <label>근로계약방법<select id="contractType"><option>서면</option><option>구두</option></select></label>
+      </div>
+      <button id="btnDraft" class="btn primary">✨ AI로 진정 내용(내용 란) 초안 만들기</button>
+      <span id="draftBadge" class="badge hidden"></span>
+      <label class="block">내용 (직접 수정할 수 있습니다)
+        <textarea id="draftText" rows="12" placeholder="위 버튼을 누르면 초안이 생성됩니다."></textarea>
+      </label>
+      <div class="grid g2" style="margin-top:14px">
+        <label>파일 첨부 (첨부할 자료 이름)<input id="attach" placeholder="예: 근로계약서 사본, 통장 거래내역"></label>
+        <label>제출할 관할 노동청 (예: 서울서부)<input id="office" placeholder="예: 서울서부"></label>
+      </div>
+      <label class="chk agree"><input id="agree1" type="checkbox"> 이 초안은 <b>참고용</b>이며 법률 자문이 아니고, 제출 전 내용을 직접 확인·수정해야 함을 이해했습니다.</label>
+      <button id="btnPdf" class="btn primary" disabled>📄 진정서 PDF 다운로드</button>
+      <button id="btnPrint" class="btn" disabled>🖨️ 인쇄</button>
+      <p class="hint">PDF는 버튼을 누르면 바로 파일로 저장됩니다. (양식: 고용노동부 진정서)</p>
+    </section>
+
+    <!-- STEP 4 -->
+    <section id="step4" class="panel hidden">
+      <h2>④ 무료 노무사 매칭</h2>
+      <p class="sub">서비스에 등록된 노무사무소 중 내 사건과 잘 맞는 곳을 추천합니다. <span class="demo-tag">시연용 가상 데이터</span></p>
+      <div id="matchList"></div>
+    </section>
+  </main>
+  <footer>HoLab! · 1팀 김연우 · 김연호 · 노유승 · 차도현 · SDGs 8.8 노동권 보호</footer>
+  </div>
+</div>
+
+<!-- 인쇄 전용 진정서 -->
+<div id="printDoc"></div>
+
+<!-- 모달 -->
+<div id="modal" class="modal hidden"><div class="modal-box" id="modalBox"></div></div>
+
+<script src="app.js"></script>
+</body>
+</html>

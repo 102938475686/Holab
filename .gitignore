@@ -1,0 +1,21 @@
+# 비밀값 (OpenAI 키, SMTP 비밀번호) — 절대 올리지 않음
+.env
+.env.*
+!.env.example
+
+# 설치·빌드 결과물 (배포 서버에서 다시 만듦)
+node_modules/
+web/node_modules/
+web/dist/
+*.log
+
+# 개인 작업 도구·스크린샷
+.claude/
+.agents/
+.aider-desk/
+.taste-skill/
+skills-lock.json
+
+# 대회 제출 자료
+제출자료/
+HoLab_소개.*

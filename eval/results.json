@@ -1,0 +1,766 @@
+{
+  "runAt": "2026-10-31T03:09:13.146Z",
+  "model": "gpt-4o-mini",
+  "note": "정답(gold)은 법제처 원문 조문과 공식 절차를 기준으로 팀이 작성한 것입니다. 사건 14건의 작은 평가이며, 정답 라벨은 노무사·법률가 검수를 거치지 않았습니다. 발표 전에 팀이 한 번 더 검토하세요.",
+  "summary": {
+    "rag": {
+      "cases": 14,
+      "caseTypeAcc": 1,
+      "top1Acc": 0.8571428571428571,
+      "citationRecall": 0.9375,
+      "citationPrecision": 1,
+      "unsupportedCitations": 0,
+      "totalCitations": 27,
+      "procedureCoverage": 0.18181818181818182,
+      "procedureCases": 11,
+      "retrievalRecall": 1
+    },
+    "plain": {
+      "cases": 14,
+      "caseTypeAcc": 1,
+      "top1Acc": 1,
+      "citationRecall": 0.1875,
+      "citationPrecision": 0.5,
+      "unsupportedCitations": 5,
+      "totalCitations": 10,
+      "procedureCoverage": 0.2727272727272727,
+      "procedureCases": 11,
+      "retrievalRecall": null
+    }
+  },
+  "rows": [
+    {
+      "id": "C01",
+      "label": "임금 체불",
+      "mode": "rag",
+      "caseType": "wage",
+      "ranking": [
+        "calc",
+        "complaint"
+      ],
+      "citations": [
+        "근로기준법 제36조 금품 청산",
+        "근로기준법 제43조 임금 지급"
+      ],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 2,
+      "citedOk": 2,
+      "citedBad": [],
+      "mustHit": 1,
+      "mustN": 1,
+      "procWanted": true,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": 1
+    },
+    {
+      "id": "C01",
+      "label": "임금 체불",
+      "mode": "plain",
+      "caseType": "wage",
+      "ranking": [
+        "calc"
+      ],
+      "citations": [
+        "근로기준법 제43조"
+      ],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 1,
+      "citedOk": 1,
+      "citedBad": [],
+      "mustHit": 1,
+      "mustN": 1,
+      "procWanted": true,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": null
+    },
+    {
+      "id": "C02",
+      "label": "주휴수당",
+      "mode": "rag",
+      "caseType": "wage",
+      "ranking": [
+        "calc",
+        "contract"
+      ],
+      "citations": [
+        "근로기준법 제55조 휴일 (주휴수당)",
+        "근로기준법 제36조 금품 청산",
+        "근로기준법 제43조 임금 지급"
+      ],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 1,
+      "citedOk": 1,
+      "citedBad": [],
+      "mustHit": 1,
+      "mustN": 1,
+      "procWanted": false,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": 1
+    },
+    {
+      "id": "C02",
+      "label": "주휴수당",
+      "mode": "plain",
+      "caseType": "wage",
+      "ranking": [
+        "calc",
+        "contract"
+      ],
+      "citations": [
+        "근로기준법 제55조"
+      ],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 1,
+      "citedOk": 1,
+      "citedBad": [],
+      "mustHit": 1,
+      "mustN": 1,
+      "procWanted": false,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": null
+    },
+    {
+      "id": "C03",
+      "label": "최저임금 미달",
+      "mode": "rag",
+      "caseType": "wage",
+      "ranking": [
+        "calc"
+      ],
+      "citations": [
+        "최저임금법 제6조 최저임금의 효력",
+        "근로기준법 제36조 금품 청산",
+        "근로기준법 제43조 임금 지급"
+      ],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 1,
+      "citedOk": 1,
+      "citedBad": [],
+      "mustHit": 1,
+      "mustN": 1,
+      "procWanted": false,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": 1
+    },
+    {
+      "id": "C03",
+      "label": "최저임금 미달",
+      "mode": "plain",
+      "caseType": "wage",
+      "ranking": [
+        "calc"
+      ],
+      "citations": [],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 0,
+      "citedOk": 0,
+      "citedBad": [],
+      "mustHit": 0,
+      "mustN": 1,
+      "procWanted": false,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": null
+    },
+    {
+      "id": "C04",
+      "label": "부당해고",
+      "mode": "rag",
+      "caseType": "dismissal",
+      "ranking": [
+        "lawyer"
+      ],
+      "citations": [
+        "근로기준법 제28조 부당해고등의 구제신청",
+        "근로기준법 제27조 해고사유 등의 서면통지",
+        "근로기준법 제23조 해고 등의 제한"
+      ],
+      "procedure": "부당해고에 대한 구제신청은 노동위원회에 해야 하며, 해고가 있었던 날부터 3개월 이내에 신청해야 해요.",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 3,
+      "citedOk": 3,
+      "citedBad": [],
+      "mustHit": 2,
+      "mustN": 2,
+      "procWanted": true,
+      "procPresent": true,
+      "procHit": true,
+      "retrievalHit": 2
+    },
+    {
+      "id": "C04",
+      "label": "부당해고",
+      "mode": "plain",
+      "caseType": "dismissal",
+      "ranking": [
+        "lawyer"
+      ],
+      "citations": [],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 0,
+      "citedOk": 0,
+      "citedBad": [],
+      "mustHit": 0,
+      "mustN": 2,
+      "procWanted": true,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": null
+    },
+    {
+      "id": "C05",
+      "label": "해고예고",
+      "mode": "rag",
+      "caseType": "dismissal",
+      "ranking": [
+        "lawyer"
+      ],
+      "citations": [
+        "근로기준법 제28조 부당해고등의 구제신청",
+        "근로기준법 제26조 해고의 예고",
+        "근로기준법 제23조 해고 등의 제한"
+      ],
+      "procedure": "근거 자료에 따르면 부당해고는 노동위원회에 구제를 신청할 수 있고, 해고가 있었던 날부터 3개월 이내에 해야 해요.",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 3,
+      "citedOk": 3,
+      "citedBad": [],
+      "mustHit": 1,
+      "mustN": 1,
+      "procWanted": true,
+      "procPresent": true,
+      "procHit": true,
+      "retrievalHit": 1
+    },
+    {
+      "id": "C05",
+      "label": "해고예고",
+      "mode": "plain",
+      "caseType": "dismissal",
+      "ranking": [
+        "lawyer"
+      ],
+      "citations": [
+        "근로기준법 제26조",
+        "근로기준법 제30조"
+      ],
+      "procedure": "해고예고수당을 청구하려면 노동청에 신고할 수 있습니다.",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 2,
+      "citedOk": 2,
+      "citedBad": [],
+      "mustHit": 1,
+      "mustN": 1,
+      "procWanted": true,
+      "procPresent": true,
+      "procHit": true,
+      "retrievalHit": null
+    },
+    {
+      "id": "C06",
+      "label": "직장 내 괴롭힘",
+      "mode": "rag",
+      "caseType": "harassment",
+      "ranking": [
+        "complaint",
+        "lawyer"
+      ],
+      "citations": [
+        "근로기준법 제76조의2 직장 내 괴롭힘의 금지",
+        "근로기준법 제76조의3 직장 내 괴롭힘 발생 시 조치"
+      ],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": false,
+      "cited": 2,
+      "citedOk": 2,
+      "citedBad": [],
+      "mustHit": 1,
+      "mustN": 1,
+      "procWanted": true,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": 1
+    },
+    {
+      "id": "C06",
+      "label": "직장 내 괴롭힘",
+      "mode": "plain",
+      "caseType": "harassment",
+      "ranking": [
+        "lawyer"
+      ],
+      "citations": [],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 0,
+      "citedOk": 0,
+      "citedBad": [],
+      "mustHit": 0,
+      "mustN": 1,
+      "procWanted": true,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": null
+    },
+    {
+      "id": "C07",
+      "label": "직장 내 성희롱",
+      "mode": "rag",
+      "caseType": "harassment",
+      "ranking": [
+        "complaint",
+        "lawyer"
+      ],
+      "citations": [
+        "남녀고용평등과 일ㆍ가정 양립 지원에 관한 법률 제12조 직장 내 성희롱의 금지",
+        "남녀고용평등과 일ㆍ가정 양립 지원에 관한 법률 제14조 직장 내 성희롱 발생 시 조치",
+        "근로기준법 제76조의2 직장 내 괴롭힘의 금지",
+        "근로기준법 제76조의3 직장 내 괴롭힘 발생 시 조치"
+      ],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": false,
+      "cited": 2,
+      "citedOk": 2,
+      "citedBad": [],
+      "mustHit": 1,
+      "mustN": 1,
+      "procWanted": true,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": 1
+    },
+    {
+      "id": "C07",
+      "label": "직장 내 성희롱",
+      "mode": "plain",
+      "caseType": "harassment",
+      "ranking": [
+        "lawyer"
+      ],
+      "citations": [
+        "남녀고용평등과 일·가정 양립 지원에 관한 법률 제13조",
+        "형법 제297조"
+      ],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 2,
+      "citedOk": 0,
+      "citedBad": [
+        "남녀고용평등과일가정양립지원에관한법률|13",
+        "형법|297"
+      ],
+      "mustHit": 0,
+      "mustN": 1,
+      "procWanted": true,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": null
+    },
+    {
+      "id": "C08",
+      "label": "산재",
+      "mode": "rag",
+      "caseType": "injury",
+      "ranking": [
+        "lawyer"
+      ],
+      "citations": [
+        "산업재해보상보험법 제37조 업무상의 재해의 인정 기준",
+        "산업재해보상보험법 제10조 근로복지공단의 설립",
+        "산업재해보상보험법 제36조 보험급여의 종류와 산정 기준 등"
+      ],
+      "procedure": "",
+      "procedureDropped": true,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 1,
+      "citedOk": 1,
+      "citedBad": [],
+      "mustHit": 1,
+      "mustN": 1,
+      "procWanted": true,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": 1
+    },
+    {
+      "id": "C08",
+      "label": "산재",
+      "mode": "plain",
+      "caseType": "injury",
+      "ranking": [
+        "lawyer"
+      ],
+      "citations": [
+        "산업재해보상보험법 제4조",
+        "산업재해보상보험법 제6조"
+      ],
+      "procedure": "산재 신청은 관할 근로복지공단에 해야 하며, 치료비 청구는 치료를 받은 의료기관에서 가능합니다.",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 2,
+      "citedOk": 0,
+      "citedBad": [
+        "산업재해보상보험법|4",
+        "산업재해보상보험법|6"
+      ],
+      "mustHit": 0,
+      "mustN": 1,
+      "procWanted": true,
+      "procPresent": true,
+      "procHit": true,
+      "retrievalHit": null
+    },
+    {
+      "id": "C09",
+      "label": "연소근로(17세)",
+      "mode": "rag",
+      "caseType": "minor",
+      "ranking": [
+        "lawyer"
+      ],
+      "citations": [
+        "근로기준법 제69조 연소근로자의 근로시간",
+        "근로기준법 제64조·제66조·제67조 연소근로자와 청소년 근로계약",
+        "근로기준법 제70조 야간근로와 휴일근로의 제한"
+      ],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 5,
+      "citedOk": 5,
+      "citedBad": [],
+      "mustHit": 1,
+      "mustN": 1,
+      "procWanted": true,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": 1
+    },
+    {
+      "id": "C09",
+      "label": "연소근로(17세)",
+      "mode": "plain",
+      "caseType": "minor",
+      "ranking": [
+        "lawyer"
+      ],
+      "citations": [],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 0,
+      "citedOk": 0,
+      "citedBad": [],
+      "mustHit": 0,
+      "mustN": 1,
+      "procWanted": true,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": null
+    },
+    {
+      "id": "C10",
+      "label": "외국인 차별",
+      "mode": "rag",
+      "caseType": "discrimination",
+      "ranking": [
+        "lawyer",
+        "complaint"
+      ],
+      "citations": [
+        "근로기준법 제6조 균등한 처우",
+        "외국인근로자의 고용 등에 관한 법률 제22조 차별 금지"
+      ],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 2,
+      "citedOk": 2,
+      "citedBad": [],
+      "mustHit": 2,
+      "mustN": 2,
+      "procWanted": true,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": 2
+    },
+    {
+      "id": "C10",
+      "label": "외국인 차별",
+      "mode": "plain",
+      "caseType": "discrimination",
+      "ranking": [
+        "lawyer"
+      ],
+      "citations": [],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 0,
+      "citedOk": 0,
+      "citedBad": [],
+      "mustHit": 0,
+      "mustN": 2,
+      "procWanted": true,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": null
+    },
+    {
+      "id": "C11",
+      "label": "여권·외국인등록증 보관",
+      "mode": "rag",
+      "caseType": "forced",
+      "ranking": [
+        "lawyer"
+      ],
+      "citations": [
+        "출입국관리법 제33조의3 외국인등록증 등의 채무이행 확보수단 제공 등의 금지",
+        "근로기준법 제7조 강제 근로의 금지"
+      ],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 1,
+      "citedOk": 1,
+      "citedBad": [],
+      "mustHit": 1,
+      "mustN": 1,
+      "procWanted": true,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": 1
+    },
+    {
+      "id": "C11",
+      "label": "여권·외국인등록증 보관",
+      "mode": "plain",
+      "caseType": "forced",
+      "ranking": [
+        "lawyer"
+      ],
+      "citations": [],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 0,
+      "citedOk": 0,
+      "citedBad": [],
+      "mustHit": 0,
+      "mustN": 1,
+      "procWanted": true,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": null
+    },
+    {
+      "id": "C12",
+      "label": "퇴직금·연차수당",
+      "mode": "rag",
+      "caseType": "severance",
+      "ranking": [
+        "calc",
+        "complaint",
+        "lawyer"
+      ],
+      "citations": [
+        "근로자퇴직급여 보장법 제8조 퇴직금",
+        "근로기준법 제60조 연차 유급휴가",
+        "근로기준법 제36조 금품 청산"
+      ],
+      "procedure": "근거 자료에 따르면 퇴직금은 계속 근로기간 1년 이상일 때 지급받아야 하고, 연차수당은 1년간 80퍼센트 이상 출근한 경우에 받을 수 있어요.",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 2,
+      "citedOk": 2,
+      "citedBad": [],
+      "mustHit": 1,
+      "mustN": 1,
+      "procWanted": true,
+      "procPresent": true,
+      "procHit": false,
+      "retrievalHit": 1
+    },
+    {
+      "id": "C12",
+      "label": "퇴직금·연차수당",
+      "mode": "plain",
+      "caseType": "severance",
+      "ranking": [
+        "calc",
+        "contract",
+        "complaint"
+      ],
+      "citations": [
+        "근로기준법 제34조",
+        "근로기준법 제60조"
+      ],
+      "procedure": "퇴직금과 연차수당 미지급 문제는 노동청에 신고할 수 있습니다.",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 2,
+      "citedOk": 1,
+      "citedBad": [
+        "근로기준법|34"
+      ],
+      "mustHit": 0,
+      "mustN": 1,
+      "procWanted": true,
+      "procPresent": true,
+      "procHit": true,
+      "retrievalHit": null
+    },
+    {
+      "id": "C13",
+      "label": "프리랜서(근로자성)",
+      "mode": "rag",
+      "caseType": "misclassified",
+      "ranking": [
+        "contract",
+        "lawyer"
+      ],
+      "citations": [
+        "근로기준법 제2조 정의",
+        "근로기준법 제17조 근로조건의 명시",
+        "외국인근로자의 고용 등에 관한 법률 제22조 차별 금지"
+      ],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 0,
+      "citedOk": 0,
+      "citedBad": [],
+      "mustHit": 0,
+      "mustN": 1,
+      "procWanted": true,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": 1
+    },
+    {
+      "id": "C13",
+      "label": "프리랜서(근로자성)",
+      "mode": "plain",
+      "caseType": "misclassified",
+      "ranking": [
+        "contract",
+        "lawyer"
+      ],
+      "citations": [],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 0,
+      "citedOk": 0,
+      "citedBad": [],
+      "mustHit": 0,
+      "mustN": 1,
+      "procWanted": true,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": null
+    },
+    {
+      "id": "C14",
+      "label": "위약금 조항",
+      "mode": "rag",
+      "caseType": "contract",
+      "ranking": [
+        "contract"
+      ],
+      "citations": [
+        "근로기준법 제20조 위약 예정의 금지",
+        "근로기준법 제15조 이 법을 위반한 근로계약",
+        "근로기준법 제17조 근로조건의 명시"
+      ],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 2,
+      "citedOk": 2,
+      "citedBad": [],
+      "mustHit": 1,
+      "mustN": 1,
+      "procWanted": false,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": 1
+    },
+    {
+      "id": "C14",
+      "label": "위약금 조항",
+      "mode": "plain",
+      "caseType": "contract",
+      "ranking": [
+        "contract"
+      ],
+      "citations": [],
+      "procedure": "",
+      "procedureDropped": false,
+      "typeOk": true,
+      "top1Ok": true,
+      "cited": 0,
+      "citedOk": 0,
+      "citedBad": [],
+      "mustHit": 0,
+      "mustN": 1,
+      "procWanted": false,
+      "procPresent": false,
+      "procHit": false,
+      "retrievalHit": null
+    }
+  ]
+}

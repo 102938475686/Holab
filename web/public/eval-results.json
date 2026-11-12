@@ -1,0 +1,31 @@
+{
+  "runAt": "2026-10-31T03:09:13.146Z",
+  "model": "gpt-4o-mini",
+  "note": "정답(gold)은 법제처 원문 조문과 공식 절차를 기준으로 팀이 작성한 것입니다. 사건 14건의 작은 평가이며, 정답 라벨은 노무사·법률가 검수를 거치지 않았습니다. 발표 전에 팀이 한 번 더 검토하세요.",
+  "summary": {
+    "rag": {
+      "cases": 14,
+      "caseTypeAcc": 1,
+      "top1Acc": 0.8571428571428571,
+      "citationRecall": 0.9375,
+      "citationPrecision": 1,
+      "unsupportedCitations": 0,
+      "totalCitations": 27,
+      "procedureCoverage": 0.18181818181818182,
+      "procedureCases": 11,
+      "retrievalRecall": 1
+    },
+    "plain": {
+      "cases": 14,
+      "caseTypeAcc": 1,
+      "top1Acc": 1,
+      "citationRecall": 0.1875,
+      "citationPrecision": 0.5,
+      "unsupportedCitations": 5,
+      "totalCitations": 10,
+      "procedureCoverage": 0.2727272727272727,
+      "procedureCases": 11,
+      "retrievalRecall": null
+    }
+  }
+}

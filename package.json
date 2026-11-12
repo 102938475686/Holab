@@ -1,0 +1,21 @@
+{
+  "name": "holab",
+  "version": "1.0.0",
+  "description": "1. `start.bat` 더블클릭 → 처음이면 `.env`가 열립니다. `OPENAI_API_KEY=` 뒤에 키를 붙여 넣고 저장. 2. 다시 `start.bat` 실행 → 브라우저에서 http://localhost:3000 이 열립니다.    (키가 없어도 규칙 기반 대체 응답으로 시연 가능)",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "build": "npm install --prefix web --include=dev && npm run build --prefix web"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "nodemailer": "^10.0.10"
+  }
+}

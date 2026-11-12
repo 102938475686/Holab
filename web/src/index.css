@@ -1,0 +1,208 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-heading: var(--font-sans);
+    --font-sans: 'Pretendard Variable', Pretendard, 'Geist Variable', 'Malgun Gothic', system-ui, sans-serif;
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.2 0.03 290);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.2 0.03 290);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.2 0.03 290);
+    --primary: oklch(0.48 0.2 295);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.96 0.015 290);
+    --secondary-foreground: oklch(0.25 0.04 290);
+    --muted: oklch(0.965 0.01 290);
+    --muted-foreground: oklch(0.45 0.03 290);
+    --accent: oklch(0.955 0.025 290);
+    --accent-foreground: oklch(0.25 0.04 290);
+    --destructive: oklch(0.52 0.22 27);
+    --border: oklch(0.89 0.02 290);
+    --input: oklch(0.86 0.02 290);
+    --ring: oklch(0.6 0.16 277);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --radius: 0.75rem;
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+    --background: oklch(0.13 0.04 295);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.2 0.05 295 / 0.82);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.21 0.05 295);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.52 0.21 295);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(1 0 0 / 0.08);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(1 0 0 / 0.07);
+    --muted-foreground: oklch(0.8 0.03 295);
+    --accent: oklch(1 0 0 / 0.1);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 0.12);
+    --input: oklch(1 0 0 / 0.16);
+    --ring: oklch(0.7 0.17 295);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
+}
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  html {
+    @apply font-sans;
+    }
+}
+html, body { background: #fff; }
+
+/* 카드: 그림자 대신 테두리로만 구분합니다. */
+[data-slot="card"] { box-shadow: none; }
+
+/* 홈 맨 위에 은은하게 번지는 보라빛 (흰 바탕 위에서 분위기만 줌) */
+#home-hero::before {
+  content: ""; position: absolute; inset: -6rem 0 0 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(60% 55% at 50% 0%, color-mix(in oklab, var(--primary) 14%, transparent), transparent 70%),
+    radial-gradient(35% 40% at 85% 30%, color-mix(in oklab, var(--primary) 7%, transparent), transparent 70%);
+}
+/* 홈 화면 등장 모션(시그니처 무브 1개) — prefers-reduced-motion일 때는 끔 */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes rise-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  .rise-in { animation: rise-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+}
+
+
+/* ── 움직임: 모두 prefers-reduced-motion 사용자에게는 적용하지 않음 ── */
+@media (prefers-reduced-motion: no-preference) {
+  /* 스크롤로 보이기 전에는 멈춰 두었다가 화면에 들어오면 재생 (Home에서 .rise-in에 .pending을 붙였다 뗌) */
+  .rise-in.pending { animation-play-state: paused; }
+
+  /* 단계가 바뀔 때 본문이 부드럽게 들어옴 */
+  @keyframes step-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  [data-slot="tabs-content"] { animation: step-in 380ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+  /* 채팅 말풍선·정리 항목이 나타남 */
+  @keyframes pop-in { from { opacity: 0; transform: translateY(8px) scale(0.97); } to { opacity: 1; transform: none; } }
+  .pop-in { animation: pop-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+  /* 로고가 아주 천천히 떠 있는 느낌 */
+  @keyframes float-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  .float-slow { animation: float-slow 6s ease-in-out infinite; }
+
+  /* 카드: 올려 두면 살짝 떠오름 */
+  .lift { transition: transform 220ms ease, border-color 220ms ease; }
+  .lift:hover { transform: translateY(-4px); border-color: color-mix(in oklab, var(--primary) 55%, transparent); }
+
+  /* ── 버튼: 올려 두면 살짝 뜨고, 누르면 눌리고, 클릭한 자리에서 물결이 퍼짐 ── */
+  [data-slot="button"] { position: relative; overflow: hidden; }
+  [data-slot="button"]:not(:disabled) { transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 200ms ease, background-color 160ms ease, border-color 160ms ease, color 160ms ease; }
+  [data-slot="button"]:not(:disabled):hover { transform: translateY(-1px); }
+  [data-slot="button"]:not(:disabled):active { transform: translateY(0) scale(0.96); }
+  /* 주 버튼은 떠오를 때 보라빛 그림자가 번짐 */
+  [data-slot="button"].bg-primary:not(:disabled):hover { box-shadow: 0 6px 18px -4px color-mix(in oklab, var(--primary) 55%, transparent); }
+  /* 화살표 아이콘은 호버 시 앞으로 살짝 나아감 */
+  [data-slot="button"] svg.lucide-arrow-right { transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1); }
+  [data-slot="button"]:not(:disabled):hover svg.lucide-arrow-right { transform: translateX(4px); }
+  [data-slot="button"]:not(:disabled):hover svg.lucide-arrow-down { animation: nudge-down 700ms ease-in-out infinite; }
+  @keyframes nudge-down { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+
+  @keyframes btn-ripple { from { transform: scale(0); opacity: 0.35; } to { transform: scale(1); opacity: 0; } }
+  .btn-ripple { position: absolute; border-radius: 9999px; pointer-events: none; background: currentColor; animation: btn-ripple 560ms ease-out forwards; }
+
+  /* 입력칸에 포커스가 가면 테두리가 부드럽게 바뀜 */
+  input, textarea { transition: border-color 180ms ease, box-shadow 180ms ease; }
+}
+
+/* 지도 핀: 추천 순위 번호가 들어간 원 */
+.holab-pin { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 9999px; background: var(--primary); color: #fff; font-weight: 800; font-size: 14px; border: 3px solid #fff; box-shadow: 0 2px 8px rgb(0 0 0 / 0.3); transition: transform 160ms ease; }
+.holab-pin.sel { background: #111827; transform: scale(1.25); box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 45%, transparent), 0 2px 8px rgb(0 0 0 / 0.35); }
+.leaflet-container { font-family: inherit; }
+
+/* 이전 단계 내용으로 자동 작성된 칸 */
+.auto-field input, .auto-field textarea { background: color-mix(in oklab, var(--primary) 6%, var(--background)); border-color: color-mix(in oklab, var(--primary) 40%, var(--border)); }
+
+/* 마스코트 올랍이: 둥실, 깜빡, 안테나 흔들, 말할 때 입 움직임 (움직임 줄이기 설정이면 멈춤) */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes mascot-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  .mascot-bob { animation: mascot-bob 3.2s ease-in-out infinite; }
+  @keyframes mascot-blink { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
+  .mascot-eyes { transform-box: fill-box; transform-origin: center; animation: mascot-blink 4.6s infinite; }
+  @keyframes mascot-wiggle { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+  .mascot-antenna { animation: mascot-wiggle 2.8s ease-in-out infinite; }
+  @keyframes mascot-talk { 0%, 100% { transform: scaleY(0.55); } 50% { transform: scaleY(1.2); } }
+  .mascot-mouth { transform-box: fill-box; transform-origin: center; animation: mascot-talk 0.36s ease-in-out infinite; }
+}
