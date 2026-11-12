@@ -64,7 +64,7 @@ interface Store {
   setAskLawyer: (b: boolean) => void
   consultNotes: string[]
   setConsultNotes: (n: string[]) => void
-  report: { lawyerName: string; summary: string; questions: string[] } | null
+  report: { lawyerName: string; summary: string; questions: string[]; have?: string[] } | null // have: 증빙 체크리스트에서 "준비됨"으로 표시한 항목 id
   setReport: (r: Store['report']) => void
   consultOpen: boolean // 홈 "무슨 문제인지 잘 모르겠어요" AI 상담 창
   setConsultOpen: (b: boolean) => void

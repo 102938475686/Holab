@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import ReportDoc from '@/components/ReportDoc'
 import { loadReservation } from '@/lib/counsel'
 import { ArrowRight, Check, CheckCircle2, ClipboardList, FileDown, Loader2, Mail, MapPin, Navigation, Phone, Receipt, Send, Sparkles, TriangleAlert } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -19,11 +20,31 @@ import { CALL_QUESTIONS, CENTERS_SOURCE, COMMON_SCOPE, LAWYERS, MAIN_PHONE, SEOU
 import { pdfBase64, savePdf } from '@/lib/pdf'
 import { useStore } from '@/store'
 
+// 리포트 미리보기: A4 폭(794px) 양식을 창 폭에 맞춰 축소해서 보여줌 (체크리스트는 여기서 바로 체크 가능)
+function ReportPreview() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [zoom, setZoom] = useState(1)
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const fit = () => setZoom(Math.min(1, Math.max(0.6, el.clientWidth / 794))) // 휴대폰에선 너무 작아지지 않게 최소 60% + 가로 스크롤
+    fit()
+    const ro = new ResizeObserver(fit)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  return (
+    <div ref={ref} className="overflow-x-auto rounded-lg border bg-white">
+      <div style={{ zoom }}><ReportDoc interactive /></div>
+    </div>
+  )
+}
+
 const validMail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s.trim())
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 export default function StepLawyer() {
-  const { calc, analysis, markDone, form, ai, consultNotes, setReport, go, caseLabel, legalConsult } = useStore()
+  const { calc, analysis, markDone, form, ai, consultNotes, report, setReport, go, caseLabel, legalConsult } = useStore()
   const [toAddr, setToAddr] = useState('') // 메일 받는 주소(사용자가 고칠 수 있음)
   const [sel, setSel] = useState<string | null>(null) // 지도·목록에서 고른 센터 (리포트 대상)
   const [subject, setSubject] = useState('')
@@ -221,13 +242,23 @@ export default function StepLawyer() {
     setComposing(false)
   }
 
-  // 대면 상담 전 1장 리포트: 짧은 상담 시간에 본론부터 말할 수 있도록 상황 요약 + 물어볼 질문을 PDF로 저장
+  // 대면 상담 전 1장 리포트: 짧은 상담 시간에 본론부터 말할 수 있도록 상황 요약 + 물어볼 질문 + 증빙 체크리스트.
+  // 먼저 만들어 미리보기로 보여주고, 사용자가 확인한 뒤 PDF로 저장
   const openReport = async (l: Lawyer) => {
-    setReportFor(l); setReportBusy(true); setReportSaved(false); setReportErr(null)
+    const have = report?.have // 앞서 체크해 둔 증빙자료는 유지
+    setReportFor(l); setReportBusy(true); setReportSaved(false); setReportErr(null); setReport(null)
     try {
       const r = await draftReport(buildFacts())
-      setReport({ lawyerName: l.name, summary: r.summary, questions: r.questions })
-      await new Promise((res) => setTimeout(res, 60)) // #reportDoc 리렌더 대기
+      setReport({ lawyerName: l.name, summary: r.summary, questions: r.questions, have })
+    } catch (e) {
+      setReportErr(e instanceof Error ? e.message : '리포트를 만들지 못했습니다.')
+    }
+    setReportBusy(false)
+  }
+  const [reportPdfBusy, setReportPdfBusy] = useState(false)
+  const downloadReport = async () => {
+    setReportPdfBusy(true); setReportErr(null)
+    try {
       const el = document.getElementById('reportDoc')
       if (!el) throw new Error('리포트 양식을 찾지 못했습니다.')
       await savePdf(el, `상담리포트_${form.pName.trim() || '김민수'}.pdf`)
@@ -235,7 +266,7 @@ export default function StepLawyer() {
     } catch (e) {
       setReportErr(e instanceof Error ? e.message : 'PDF를 만들지 못했습니다.')
     }
-    setReportBusy(false)
+    setReportPdfBusy(false)
   }
 
   const send = async () => {
@@ -503,18 +534,19 @@ export default function StepLawyer() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!reportFor} onOpenChange={(o) => { if (!o && !reportBusy) setReportFor(null) }}>
-        <DialogContent>
+      <Dialog open={!!reportFor} onOpenChange={(o) => { if (!o && !reportBusy && !reportPdfBusy) setReportFor(null) }}>
+        <DialogContent className="max-h-[92dvh] overflow-y-auto sm:max-w-3xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><Receipt className="size-5 text-primary" /> 상담 전 1장 리포트</DialogTitle>
-            <DialogDescription>{reportFor?.name} 방문 상담 전, 지금까지 입력한 내용(상담·못 받은 돈·계약서 쟁점)으로 상황 요약과 물어볼 질문을 자동으로 정리해 PDF 한 장으로 만들어 드려요.</DialogDescription>
+            <DialogTitle className="flex items-center gap-2"><Receipt className="size-5 text-primary" /> 상담 준비 리포트 미리보기</DialogTitle>
+            <DialogDescription>{reportFor?.name} 방문 상담 전, 지금까지 입력한 내용으로 정리했어요. 내용을 확인하고 다운로드할지 정하세요. 가지고 있는 증빙자료는 체크해 두면 PDF에도 표시돼요.</DialogDescription>
           </DialogHeader>
           {reportBusy && (
-            <div className="flex h-28 items-center justify-center gap-2 text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin" /> 리포트를 만들고 PDF로 저장하는 중…</div>
+            <div className="flex h-28 items-center justify-center gap-2 text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin" /> 리포트를 만드는 중…</div>
           )}
           {!reportBusy && reportErr && (
             <Alert variant="destructive"><TriangleAlert /><AlertDescription>{reportErr}</AlertDescription></Alert>
           )}
+          {!reportBusy && report && <ReportPreview />}
           {!reportBusy && reportSaved && !reportErr && (
             <div className="rounded-lg border bg-muted/50 p-3 text-sm leading-relaxed">
               리포트 PDF가 저장되었습니다. 상담 시간이 짧아도 상황·쟁점·질문을 바로 꺼내 보여줄 수 있어요.
@@ -522,8 +554,13 @@ export default function StepLawyer() {
           )}
           <p className="text-[13px] text-muted-foreground"><Badge variant="outline" className="mr-1">참고용</Badge>법률 자문이 아니며, 상담 시 노무사와 사실 관계를 다시 확인하세요.</p>
           <DialogFooter>
-            {reportErr && <Button variant="outline" onClick={() => reportFor && openReport(reportFor)}>다시 시도</Button>}
-            <Button onClick={() => setReportFor(null)} disabled={reportBusy}>확인</Button>
+            {reportErr && !report && <Button variant="outline" onClick={() => reportFor && openReport(reportFor)}>다시 시도</Button>}
+            <Button variant="outline" onClick={() => setReportFor(null)} disabled={reportBusy || reportPdfBusy}>{reportSaved ? '닫기' : '다운로드 안 하고 닫기'}</Button>
+            {!reportBusy && report && (
+              <Button onClick={downloadReport} disabled={reportPdfBusy}>
+                {reportPdfBusy ? <Loader2 className="animate-spin" /> : <FileDown />} {reportPdfBusy ? 'PDF 만드는 중…' : reportSaved ? '다시 다운로드' : 'PDF 다운로드'}
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

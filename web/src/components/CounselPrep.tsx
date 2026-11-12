@@ -73,7 +73,7 @@ export default function CounselPrep({ center, lawyer, dist, chosen, openReport, 
             <div className="flex flex-wrap items-center gap-2 font-semibold">상담 준비 리포트 <span className={`rounded-full px-2 text-[13px] ${reportTone.cls}`}>{reportTone.badge}</span></div>
             <p className="text-[13px] text-muted-foreground">{m.reportNote}</p>
           </div>
-          <Button variant="outline" onClick={() => openReport(center)} disabled={reportBusy}>{reportBusy ? <Loader2 className="animate-spin" /> : <FileDown />} 리포트 PDF 만들기</Button>
+          <Button variant="outline" onClick={() => openReport(center)} disabled={reportBusy}>{reportBusy ? <Loader2 className="animate-spin" /> : <FileDown />} 리포트 미리보기</Button>
         </div>
       ) : (
         <div className="flex flex-wrap items-center gap-6 rounded-xl border-2 border-primary/40 bg-background/80 p-4 sm:p-5">
@@ -97,7 +97,7 @@ export default function CounselPrep({ center, lawyer, dist, chosen, openReport, 
             </ul>
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <Button size="lg" className="h-12 px-6 text-base font-bold" onClick={() => openReport(center)} disabled={reportBusy}>
-                {reportBusy ? <Loader2 className="animate-spin" /> : <FileDown className="size-5" />} 상담 준비 리포트 만들기 (PDF)
+                {reportBusy ? <Loader2 className="animate-spin" /> : <FileDown className="size-5" />} 상담 준비 리포트 미리보기
               </Button>
               {(method === 'visit' || method === 'video') && (
                 <Button variant="outline" onClick={saveComplaintPdf} disabled={cmpBusy || form.draft.trim().length < 20}>{cmpBusy ? <Loader2 className="animate-spin" /> : <FileDown />} 진정서 PDF</Button>

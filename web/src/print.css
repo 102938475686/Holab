@@ -31,6 +31,12 @@
 .hreport .rtable th, .hreport .rtable td { border: 1px solid #ccc; padding: 6px 8px; font-size: 12px; text-align: left; }
 .hreport .rtable th { background: #F5F6FA; font-weight: 700; width: 24%; }
 .hreport .rtable td.rstrong { font-weight: 800; color: #DC2626; }
+.hreport .rcheck { list-style: none; padding-left: 0; }
+.hreport .rcheck li { display: flex; align-items: flex-start; gap: 8px; }
+.hreport .rbox { flex: none; width: 15px; height: 15px; margin-top: 2px; border: 1.5px solid #555; border-radius: 3px; background: #fff; color: #fff; font-size: 11px; line-height: 12px; text-align: center; padding: 0; }
+.hreport .rbox.on { background: #2E1065; border-color: #2E1065; }
+.hreport button.rbox { cursor: pointer; }
+.hreport .rwhy { color: #555; }
 .hreport .rquestions { margin-top: 14px; background: #EEF0FB; border: 1px solid #C7D2FE; border-radius: 8px; padding: 10px 14px 14px; }
 .hreport .rquestions h2 { margin-top: 0; }
 .hreport .rfoot { margin-top: 16px; font-size: 10px; color: #555; border-top: 1px solid #ccc; padding-top: 8px; }
