@@ -7,7 +7,7 @@ interface Action { label: string; onClick: () => void; disabled?: boolean; icon?
 
 // 모든 단계 하단에 똑같은 모양으로 "다음에 뭘 해야 하는지"를 보여주는 안내 바.
 // 추천 행동 하나(파란 버튼)만 눈에 띄게 하고, 나머지 선택지는 옅게 보조로 둡니다.
-export function StepFooter({ hint, primary, secondary }: { hint?: string; primary: Action; secondary?: Action[] }) {
+export function StepFooter({ hint, primary, secondary }: { hint?: string; primary?: Action; secondary?: Action[] }) {
   return (
     <CardFooter className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
       {hint && <p className="text-[13px] text-muted-foreground sm:max-w-sm">{hint}</p>}
@@ -15,7 +15,7 @@ export function StepFooter({ hint, primary, secondary }: { hint?: string; primar
         {secondary?.map((s) => (
           <Button key={s.label} variant="outline" size="sm" onClick={s.onClick} disabled={s.disabled}>{s.icon}{s.label}</Button>
         ))}
-        <Button onClick={primary.onClick} disabled={primary.disabled}>{primary.icon}{primary.label} {!primary.icon && <ArrowRight />}</Button>
+        {primary && <Button onClick={primary.onClick} disabled={primary.disabled}>{primary.icon}{primary.label} {!primary.icon && <ArrowRight />}</Button>}
       </div>
     </CardFooter>
   )

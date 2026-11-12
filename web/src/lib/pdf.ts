@@ -33,7 +33,8 @@ async function render(container: HTMLElement): Promise<jsPDF> {
     const target = (container.firstElementChild as HTMLElement) ?? container
     // 화면(창) 크기와 상관없이 양식 폭(794px = A4)에 맞춰 캡처
     const w = target.offsetWidth || 794
-    const canvas = await html2canvas(target, { scale: 2, backgroundColor: '#ffffff', useCORS: true, width: w, windowWidth: w, scrollX: 0, scrollY: 0 })
+    // iPad·iPhone은 캔버스 최대 크기(약 1,670만 픽셀)가 작아 긴 문서가 하얗게 나올 수 있어 배율을 낮춤
+    const canvas = await html2canvas(target, { scale: isIOS() ? 1.5 : 2, backgroundColor: '#ffffff', useCORS: true, width: w, windowWidth: w, scrollX: 0, scrollY: 0 })
     const pdf = new jsPDF({ unit: 'mm', format: 'a4' })
     const imgH = (canvas.height * PW) / canvas.width
     if (imgH <= PH * 1.08) {
@@ -84,9 +85,27 @@ async function render(container: HTMLElement): Promise<jsPDF> {
   }
 }
 
+// jsPDF의 save()는 iPad·iPhone Safari에서 파일 형식을 'application/octet-stream'으로 바꿔 열어서
+// "지원하지 않는 형식"이 뜸. PDF 형식(application/pdf)을 유지한 채 직접 저장함.
+const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+
 export async function savePdf(container: HTMLElement, filename: string) {
   const pdf = await render(container)
-  pdf.save(filename)
+  const blob = new Blob([pdf.output('arraybuffer')], { type: 'application/pdf' })
+  const url = URL.createObjectURL(blob)
+  if (isIOS() && !('download' in HTMLAnchorElement.prototype)) {
+    // 다운로드 속성을 모르는 아주 오래된 iOS: PDF를 새 탭에 열어 공유 버튼으로 저장하게 함
+    window.open(url, '_blank') || (location.href = url)
+  } else {
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.rel = 'noopener'
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 60_000)
 }
 
 // 메일 첨부용: PDF를 base64 문자열로

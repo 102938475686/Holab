@@ -198,15 +198,26 @@ export default function Home() {
       <section id="home-hero" className="relative flex min-h-[calc(100dvh-2.5rem)] flex-col">
         <div className="px-5 pb-6 pt-8 text-center">
           <div {...riseIn(0)} className={`${riseIn(0).className} flex items-center justify-center gap-3`}>
-            <span className="float-slow flex h-14 w-16 shrink-0 items-center justify-center sm:h-16 sm:w-[4.5rem]">
+            <span className="float-slow flex h-16 w-[4.5rem] shrink-0 items-center justify-center sm:h-24 sm:w-28">
               <img src={logo} alt="HoLab 로고" className="h-full w-full object-contain" />
             </span>
-            <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl">HoLab</h1>
+            <h1 className="text-6xl font-extrabold tracking-tight sm:text-8xl">HoLab</h1>
           </div>
-          <p {...riseIn(2)} className={`${riseIn(2).className} mt-3 text-lg font-medium text-primary`}>청년 노동권 도우미 에이전트</p>
+          <p {...riseIn(2)} className={`${riseIn(2).className} mt-3 text-lg font-medium text-primary sm:text-xl`}>청년 노동권 도우미 에이전트</p>
           <p {...riseIn(3)} className={`${riseIn(3).className} mx-auto mt-2 max-w-xl text-[15px] leading-relaxed text-muted-foreground`}>
             임금 계산부터 계약서 분석, 진정서 작성, 노무사 매칭까지 — 받아야 할 돈을 놓치지 않도록 한 곳에서 도와드려요.
           </p>
+          {/* HoLab(서비스)과 올랍이(그 안의 AI 안내 도우미) 역할 구분 */}
+          <div {...riseIn(3)} className={`${riseIn(3).className} mx-auto mt-4 grid max-w-xl gap-2 text-left text-sm sm:grid-cols-2`}>
+            <div className="flex items-start gap-2.5 rounded-xl border bg-background/70 p-3">
+              <img src={logo} alt="" className="mt-0.5 h-7 w-8 shrink-0 object-contain" />
+              <span><b>HoLab</b> <span className="text-muted-foreground">— 서비스 이름이에요. 못 받은 돈 계산, 계약서 분석, 진정서 작성, 노무사 매칭 기능을 모두 담고 있어요.</span></span>
+            </div>
+            <div className="flex items-start gap-2.5 rounded-xl border bg-background/70 p-3">
+              <Mascot size={30} className="shrink-0" />
+              <span><b>올랍이</b> <span className="text-muted-foreground">— HoLab 안의 AI 안내 도우미예요. 상황을 듣고 정리해서, 다음에 쓸 기능을 알려 줘요.</span></span>
+            </div>
+          </div>
         </div>
 
         <div className="grid flex-1 md:grid-cols-2">

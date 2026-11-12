@@ -15,6 +15,7 @@ import { draftComplaint, judgeComplaint, type JudgeComplaintReply } from '@/lib/
 import { won } from '@/lib/calc'
 import { calcIssues, clauseIssues, dedupeIssues, verdictOf } from '@/lib/legal'
 import { savePdf } from '@/lib/pdf'
+import { EVIDENCE_ALT, evidenceList, type Evidence } from '@/lib/evidence'
 import { useStore } from '@/store'
 
 const SUBS = ['진정인', '사업장', '진정 내용', '내용 작성', '최종 확인']
@@ -29,7 +30,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export default function StepComplaint() {
-  const { calc, analysis, masked, form, setForm, setAskLawyer, consultNotes, setConsultNotes, autoSrc, markAuto, clearAuto, legalConsult } = useStore()
+  const { calc, analysis, masked, form, setForm, setAskLawyer, consultNotes, setConsultNotes, autoSrc, markAuto, clearAuto, legalConsult, caseKey, caseLabel, report, setReport } = useStore()
   const [agree, setAgree] = useState(false)
   const [busy, setBusy] = useState(false)
   const [pdfBusy, setPdfBusy] = useState(false)
@@ -98,15 +99,25 @@ export default function StepComplaint() {
     setBusy(false)
   }
 
-  // 사건 유형별 증빙 안내: 계산·계약서 분석에서 확인된 문제에 맞춰 보여줌
-  const [have, setHave] = useState<Set<string>>(new Set())
-  const evidence = useMemo(() => {
-    const out = [{ name: '급여명세서·월급이 들어온 통장 거래내역', why: '실제로 얼마를 받았는지 보여줘요', alt: '은행 앱에서 입금 내역을 캡처하거나 거래내역서를 발급받으세요.' }]
-    if (calc?.holUnpaid || calc?.extraUnpaid || calc?.minWageUnpaid || !calc) out.push({ name: '출퇴근 기록', why: '일한 시간을 증명해요 (수당 청구에 특히 중요)', alt: '메신저 근무표, 교통카드 내역, 직접 적은 근무 메모도 도움이 돼요.' })
-    if ((analysis?.clauses.length ?? 0) > 0 || !analysis) out.push({ name: '근로계약서 사본', why: '약속된 조건을 보여줘요', alt: '사업장에 사본을 요청하거나, 받은 문자·카톡 등 조건이 적힌 대화를 모아 두세요.' })
-    out.push({ name: '사장님과 나눈 문자·카톡', why: '요청과 답변의 증거가 돼요', alt: '앞으로는 요청 내용을 문자나 카톡으로 남겨 두세요.' })
-    return out
-  }, [calc, analysis])
+  // 사건 유형별 증빙 안내: 상담 내용·계산·계약서 분석에 맞춰 만들고, 각 자료가 어떤 쟁점을 보여주는지 연결해서 보여줌
+  // (상담 준비 리포트의 체크리스트와 같은 목록·같은 체크 상태)
+  const have = useMemo(() => new Set(report?.have ?? []), [report])
+  const setHave = (id: string, on: boolean) => {
+    const next = on ? [...have, id] : [...have].filter((h) => h !== id)
+    setReport({ lawyerName: report?.lawyerName ?? '', summary: report?.summary ?? '', questions: report?.questions ?? [], have: next })
+  }
+  const evidence = useMemo(() => evidenceList({
+    calc, analysis, caseKey,
+    text: [caseLabel, ...consultNotes, ...legalConsult.map((x) => x.title), form.draft].join(' '),
+  }), [calc, analysis, caseKey, caseLabel, consultNotes, legalConsult, form.draft])
+  // 쟁점별로 묶기: "주휴수당 ← 급여명세서, 출퇴근 기록"
+  // 계약서·대화·신분증처럼 어느 사건에나 필요한 자료는 "공통"으로 마지막에 모음
+  const byIssue = useMemo(() => {
+    const COMMON = new Set(['근로 조건', '사건 경위', '본인 확인'])
+    const m = new Map<string, Evidence[]>()
+    for (const e of evidence) { const k = COMMON.has(e.proves) ? '' : e.proves; m.set(k, [...(m.get(k) ?? []), e]) }
+    return [...m.entries()].sort(([a], [b]) => Number(a === '') - Number(b === ''))
+  }, [evidence])
 
   const checks = [
     { sub: 1, label: '진정인 성명·연락처', ok: !!form.pName.trim() && !!(form.pMobile.trim() || form.pTel.trim()) },
@@ -136,15 +147,40 @@ export default function StepComplaint() {
         <CardDescription>고용노동부 <b>진정서 양식</b> 그대로 작성됩니다. 인적사항(성명·주민번호 등)은 <b>이 브라우저에만</b> 입력되며 AI에는 전송되지 않습니다. 계약서·계산 결과에서 알 수 있는 항목은 자동으로 채워집니다.</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-6">
-        <Alert>
-          <AlertDescription>
+        {/* AI에 전달되는 사실관계를 항목별 목록으로: 초안을 만들기 전에 틀린 게 없는지 한눈에 확인 */}
+        <details className="group rounded-xl border p-4" open={sub === 4}>
+          <summary className="cursor-pointer text-sm font-semibold">AI에 전달되는 사실관계 확인하기 <span className="font-normal text-muted-foreground">(인적사항은 보내지 않아요)</span></summary>
+          <div className="mt-3 grid gap-3 text-sm">
             {calc ? (
-              <span><b>AI에 전달되는 사실관계</b> (인적사항 제외) · 시급 {calc.hourly.toLocaleString()}원 · 주 {calc.weekly}시간 · {calc.months}개월 · 미지급 추정 {won(calc.total)}
-                {issues.length > 0 && <span className="mt-1.5 flex flex-wrap gap-1.5">{issues.map((i) => <Badge key={i} variant="secondary">{i}</Badge>)}</span>}
-              </span>
-            ) : '못 받은 돈 확인을 먼저 해 두면 초안이 더 정확해집니다.'}
-          </AlertDescription>
-        </Alert>
+              <dl className="grid gap-x-6 gap-y-1.5 sm:grid-cols-2">
+                <div className="flex justify-between gap-3"><dt className="text-muted-foreground">시급</dt><dd>{calc.hourly.toLocaleString()}원</dd></div>
+                <div className="flex justify-between gap-3"><dt className="text-muted-foreground">주 근로시간</dt><dd>{calc.weekly}시간</dd></div>
+                <div className="flex justify-between gap-3"><dt className="text-muted-foreground">일한 기간</dt><dd>{calc.months ? `${calc.months}개월` : '입력 안 함'}</dd></div>
+                <div className="flex justify-between gap-3"><dt className="text-muted-foreground">5인 미만 사업장</dt><dd>{calc.under5 ? '예' : '아니오'}</dd></div>
+                {calc.holUnpaid > 0 && <div className="flex justify-between gap-3"><dt className="text-muted-foreground">주휴수당 미지급</dt><dd>{won(calc.holUnpaid)}</dd></div>}
+                {calc.extraUnpaid > 0 && <div className="flex justify-between gap-3"><dt className="text-muted-foreground">가산수당 미지급</dt><dd>{won(calc.extraUnpaid)}</dd></div>}
+                {calc.minWageUnpaid > 0 && <div className="flex justify-between gap-3"><dt className="text-muted-foreground">최저임금 차액</dt><dd>{won(calc.minWageUnpaid)}</dd></div>}
+                <div className="flex justify-between gap-3 font-semibold"><dt>미지급 추정 합계</dt><dd>{won(calc.total)}</dd></div>
+              </dl>
+            ) : <p className="text-muted-foreground">못 받은 돈 확인을 먼저 해 두면 금액이 함께 전달돼 초안이 더 정확해져요.</p>}
+            {issues.length > 0 && (
+              <div>
+                <p className="mb-1 font-semibold">확인된 문제</p>
+                <ul className="list-disc space-y-0.5 pl-5">{issues.map((i) => <li key={i}>{i}</li>)}</ul>
+              </div>
+            )}
+            {(consultNotes.length > 0 || form.timeline.trim()) && (
+              <div>
+                <p className="mb-1 font-semibold">상담·경과 메모</p>
+                <ul className="list-disc space-y-0.5 pl-5 text-muted-foreground">
+                  {consultNotes.slice(0, 8).map((n) => <li key={n}>{n}</li>)}
+                  {form.timeline.split('\n').map((l) => l.trim()).filter(Boolean).map((l) => <li key={'t' + l}>경과: {l}</li>)}
+                </ul>
+              </div>
+            )}
+            <p className="text-[13px] text-muted-foreground">틀린 내용이 있으면 해당 단계(못 받은 돈 확인·계약서 분석)에서 고치거나, “있었던 일의 순서”를 수정하세요.</p>
+          </div>
+        </details>
 
         <ol className="flex flex-wrap gap-1.5 text-[13px]" aria-label="진정서 작성 단계">
           {SUBS.map((s, i) => (
@@ -238,36 +274,53 @@ export default function StepComplaint() {
             </ul>
             <p className="mt-1.5 text-muted-foreground">비어 있어도 PDF는 만들 수 있지만, 접수 전에 채우는 게 좋아요.</p>
           </div>
-          <div className="rounded-lg border p-3.5 text-[13px]">
-            <div className="mb-1.5 font-semibold text-foreground">추가하면 좋은 정보 · 내 사건에 필요한 증빙</div>
-            <ul className="grid gap-2">
-              {evidence.map((e) => (
-                <li key={e.name} className="flex items-start gap-2">
-                  <Checkbox id={`ev-${e.name}`} checked={have.has(e.name)} onCheckedChange={(v) => setHave((s) => { const n = new Set(s); if (v) n.add(e.name); else n.delete(e.name); return n })} className="mt-0.5" />
-                  <Label htmlFor={`ev-${e.name}`} className="grid cursor-pointer gap-0.5 font-normal">
-                    <span className="text-foreground">{e.name} <span className="text-muted-foreground">— {e.why}</span></span>
-                    {!have.has(e.name) && <span className="text-muted-foreground">없다면: {e.alt}</span>}
-                  </Label>
-                </li>
+          <div className="rounded-lg border p-3.5 text-[13px] sm:col-span-2">
+            <div className="mb-1 font-semibold text-foreground">내 사건의 쟁점과 증빙자료</div>
+            <p className="mb-2 text-muted-foreground">각 쟁점을 어떤 자료로 보여줄 수 있는지 묶었어요. 갖고 있는 자료를 체크하세요. (상담 준비 리포트의 체크리스트와 같이 저장돼요)</p>
+            <div className="grid gap-3">
+              {byIssue.map(([issue, list]) => (
+                <div key={issue} className="grid gap-1.5 rounded-md bg-muted/40 p-2.5">
+                  <p className="font-semibold text-foreground">{issue ? `쟁점: ${issue}` : '어느 사건에나 필요한 기본 자료'}</p>
+                  <ul className="grid gap-1.5">
+                    {list.map((e) => (
+                      <li key={e.id} className="flex items-start gap-2">
+                        <Checkbox id={`ev-${issue}-${e.id}`} checked={have.has(e.id)} onCheckedChange={(v) => setHave(e.id, !!v)} className="mt-0.5" />
+                        <Label htmlFor={`ev-${issue}-${e.id}`} className="grid cursor-pointer gap-0.5 font-normal">
+                          <span className="text-foreground">{e.label} <span className="text-muted-foreground">— {e.why}</span></span>
+                          {!have.has(e.id) && EVIDENCE_ALT[e.id] && <span className="text-muted-foreground">없다면: {EVIDENCE_ALT[e.id]}</span>}
+                        </Label>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
-            </ul>
-            <p className="mt-1.5 text-muted-foreground">없는 자료가 있어도 괜찮아요. 위 “파일 첨부” 칸에는 갖고 있는 자료 이름만 적어 주세요.</p>
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <Button variant="outline" size="sm" disabled={!have.size} onClick={() => setForm({ attach: evidence.filter((e) => have.has(e.id)).map((e) => e.label.replace(/\s*\(.*\)$/, '')).join(', ') })}>체크한 자료를 “파일 첨부” 칸에 넣기</Button>
+              <span className="text-muted-foreground">없는 자료가 있어도 진정은 할 수 있어요.</span>
+            </div>
           </div>
         </div>}
 
-        {sub === 5 && <ComplaintJudge missing={checks.filter((c) => !c.ok).map((c) => ({ label: c.label, sub: c.sub }))} have={have.size} need={evidence.length} autoCount={Object.keys(autoSrc).length} draftDone={form.draft.trim().length > 20} goSub={setSub} />}
-
-        {sub === 5 && <div className="flex items-start gap-2.5 rounded-lg bg-muted/60 p-3.5">
-          <Checkbox id="agree1" checked={agree} onCheckedChange={(v) => setAgree(!!v)} className="mt-0.5" />
-          <Label htmlFor="agree1" className="cursor-pointer font-normal leading-relaxed"><span>이 초안은 <b>참고용</b>이며 법률 자문이 아니고, 제출 전 내용을 직접 확인·수정해야 함을 이해했습니다.</span></Label>
+        {/* PDF 다운로드는 HoLab의 판단보다 먼저: 동의 → 다운로드 → (그 아래) 보완 제안 */}
+        {sub === 5 && <div className="grid gap-3 rounded-xl border-2 border-primary/40 p-4">
+          <div className="flex items-start gap-2.5">
+            <Checkbox id="agree1" checked={agree} onCheckedChange={(v) => setAgree(!!v)} className="mt-0.5" />
+            <Label htmlFor="agree1" className="cursor-pointer font-normal leading-relaxed"><span>이 초안은 <b>참고용</b>이며 법률 자문이 아니고, 제출 전 내용을 직접 확인·수정해야 함을 이해했습니다.</span></Label>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button size="lg" onClick={download} disabled={!ready || pdfBusy}><FileDown /> {pdfBusy ? 'PDF 만드는 중…' : '진정서 PDF 다운로드'}</Button>
+            <span className="text-[13px] text-muted-foreground">{ready ? 'PDF를 저장하면 노무사 매칭으로 이어갈지 물어봐요. (양식: 고용노동부 진정서)' : '위 동의에 체크하고 진정 내용을 채우면 PDF를 만들 수 있어요.'}</span>
+          </div>
         </div>}
+
+        {sub === 5 && <ComplaintJudge missing={checks.filter((c) => !c.ok).map((c) => ({ label: c.label, sub: c.sub }))} have={evidence.filter((e) => have.has(e.id)).length} need={evidence.length} autoCount={Object.keys(autoSrc).length} draftDone={form.draft.trim().length > 20} goSub={setSub} />}
       </CardContent>
       {sub < 5 ? (
         <StepFooter hint="입력한 내용은 자동으로 저장돼요." primary={{ label: '다음: ' + SUBS[sub], onClick: () => setSub(sub + 1) }} secondary={sub > 1 ? [{ label: '이전', onClick: () => setSub(sub - 1) }] : undefined} />
       ) : (
       <StepFooter
-        hint={ready ? 'PDF를 저장하면 노무사 매칭으로 이어갈지 물어봐요. (양식: 고용노동부 진정서)' : '위 동의에 체크하고 내용을 채우면 PDF를 만들 수 있어요.'}
-        primary={{ label: pdfBusy ? 'PDF 만드는 중…' : '진정서 PDF 다운로드', onClick: download, disabled: !ready || pdfBusy, icon: <FileDown /> }}
+        hint="진정서 PDF 다운로드 버튼은 위쪽 동의 체크 바로 아래에 있어요."
         secondary={[{ label: '이전', onClick: () => setSub(4) }]}
       />
       )}

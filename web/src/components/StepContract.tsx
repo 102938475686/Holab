@@ -32,6 +32,77 @@ const CERTAINTY: Record<string, string> = {
   low: '확실성: 참고용 의견이에요. 문제가 아닐 수도 있어요.',
 }
 
+// OCR 전처리: 휴대폰 사진은 글자가 작고 회색 배경·그림자가 있어 인식률이 떨어짐.
+// 글자가 충분히 커지게 확대(가로 1,800px 이상) → 흑백 → 밝기 범위를 늘려 대비를 높임. 모두 브라우저 안에서 처리.
+async function prepImage(src: string): Promise<string> {
+  const img = new Image()
+  img.src = src
+  await img.decode()
+  const scale = Math.min(3, Math.max(1, 1800 / img.naturalWidth))
+  const w = Math.round(img.naturalWidth * scale), h = Math.round(img.naturalHeight * scale)
+  const cv = document.createElement('canvas')
+  cv.width = w; cv.height = h
+  const ctx = cv.getContext('2d', { willReadFrequently: true })
+  if (!ctx) return src
+  ctx.imageSmoothingQuality = 'high'
+  ctx.drawImage(img, 0, 0, w, h)
+  const d = ctx.getImageData(0, 0, w, h)
+  const px = d.data
+  const hist = new Uint32Array(256)
+  for (let i = 0; i < px.length; i += 4) {
+    const g = Math.round(px[i] * 0.299 + px[i + 1] * 0.587 + px[i + 2] * 0.114)
+    px[i] = px[i + 1] = px[i + 2] = g
+  }
+  // 그림자 제거: 크게 흐린 사본(=종이 배경 밝기)으로 나눠서 어두운 부분의 글자도 살림.
+  // canvas filter를 지원하지 않는 브라우저(구형 Safari 등)에서는 이 단계만 건너뜀.
+  const bgCv = document.createElement('canvas')
+  bgCv.width = w; bgCv.height = h
+  const bg = bgCv.getContext('2d', { willReadFrequently: true })
+  if (bg && typeof bg.filter === 'string') {
+    ctx.putImageData(d, 0, 0)
+    bg.filter = `blur(${Math.round(w / 60)}px)`
+    if (bg.filter !== 'none') {
+      bg.drawImage(cv, 0, 0)
+      const b = bg.getImageData(0, 0, w, h).data
+      for (let i = 0; i < px.length; i += 4) px[i] = Math.min(255, (px[i] / Math.max(1, b[i])) * 235)
+    }
+  }
+  for (let i = 0; i < px.length; i += 4) hist[px[i]]++
+  // 어두운 쪽·밝은 쪽 1%를 잘라 낸 범위를 0~255로 늘림
+  const n = w * h
+  let lo = 0, hi = 255, acc = 0
+  while (lo < 255 && (acc += hist[lo]) < n * 0.01) lo++
+  acc = 0
+  while (hi > 0 && (acc += hist[hi]) < n * 0.01) hi--
+  const range = Math.max(1, hi - lo)
+  for (let i = 0; i < px.length; i += 4) {
+    const v = Math.max(0, Math.min(255, ((px[i] - lo) * 255) / range))
+    px[i] = px[i + 1] = px[i + 2] = v
+  }
+  ctx.putImageData(d, 0, 0)
+  return cv.toDataURL('image/png')
+}
+
+// OCR이 숫자를 자주 틀리는 패턴 바로잡기: 금액의 쉼표가 점으로(10.320원), 시각의 쌍점이 5·숫자로(16500~20:00)
+function fixOcrNumbers(t: string) {
+  return t
+    .replace(/(\d{1,3})[.·](\d{3})(?=\s*원)/g, '$1,$2')
+    .replace(/(?<![\d:])([01]?\d|2[0-3])[\d:;.]?([0-5]\d)(?=\s*[~∼-]\s*\d{1,2}\s*:)/g, '$1:$2')
+}
+
+// 사진과 꼭 대조해야 할 핵심 숫자들 (OCR 결과에서 찾은 값)
+function keyNumbers(t: string): { label: string; value: string }[] {
+  const s = t.replace(/[ \t]+/g, ' ')
+  const pick = (label: string, re: RegExp) => { const m = s.match(re); return m ? [{ label, value: m[1].trim() }] : [] }
+  return [
+    ...pick('시급', /시급[^0-9\n]{0,6}([0-9][0-9,.]{3,8}\s*원)/),
+    ...pick('근로시간', /근로\s*시간[^:\n]*:\s*([^\n]{3,40})/),
+    ...pick('근로개시일', /근로\s*개시일[^:\n]*:\s*([^\n]{6,20})/),
+    ...pick('임금 지급일', /임금\s*지급일[^:\n]*:\s*([^\n]{2,20})/),
+    ...pick('근로자 수', /근로자\s*수[^:\n]*:\s*([^\n]{1,10})/),
+  ]
+}
+
 export default function StepContract() {
   const { pasteText, setPasteText, masked, setMasked, analysis, setAnalysis, markDone, go, calc, sampleId } = useStore()
   const [tab, setTab] = useState(() => (pasteText.trim() ? 'paste' : 'photo')) // 샘플로 시작해 이미 글이 있으면 바로 텍스트 탭
@@ -44,6 +115,7 @@ export default function StepContract() {
   const [busy, setBusy] = useState(false)
   const [useRag, setUseRag] = useState(true) // 법령 근거 검색(RAG) 켜기/끄기 — 끄면 AI가 자체 지식만으로 판단
   const [err, setErr] = useState<string | null>(null)
+  const [fromOcr, setFromOcr] = useState(false) // 사진에서 읽은 글이면 "숫자 확인" 안내를 보여 줌
   const fileRef = useRef<HTMLInputElement>(null)
   const taRef = useRef<HTMLTextAreaElement>(null)
 
@@ -58,7 +130,8 @@ export default function StepContract() {
       const { default: Tesseract } = await import('tesseract.js')
       let all = ''; let conf = 0
       for (let i = 0; i < srcs.length; i++) {
-        const { data } = await Tesseract.recognize(srcs[i], 'kor+eng', {
+        const src = await prepImage(srcs[i]).catch(() => srcs[i])
+        const { data } = await Tesseract.recognize(src, 'kor+eng', {
           logger: (m: { status: string; progress: number }) => {
             const pg = srcs.length > 1 ? ` (${i + 1}/${srcs.length}쪽)` : ''
             if (m.status === 'recognizing text') { setPct(10 + ((i + m.progress) / srcs.length) * 88); setPctText(`글자 인식 중…${pg} ${Math.round(m.progress * 100)}%`) }
@@ -68,7 +141,8 @@ export default function StepContract() {
         all += (data.text || '') + '\n'; conf += data.confidence / srcs.length
       }
       setPct(null)
-      const text = all.trim()
+      const text = fixOcrNumbers(all.trim())
+      setFromOcr(true)
       const hangul = (text.match(/[가-힣]/g) || []).length
       if (conf < 55 || hangul < 40 || !/(시급|임금|근로시간|근무|계약)/.test(text)) {
         setRetry(`글자를 또렷하게 읽지 못했습니다. (인식 신뢰도 ${Math.round(conf)}%, 읽은 한글 ${hangul}자)`)
@@ -86,7 +160,7 @@ export default function StepContract() {
     try {
       const { readPdf } = await import('@/lib/pdfText')
       const r = await readPdf(f)
-      if (r.text) { setPct(null); showMasked(r.text); return } // 글자가 들어 있는 PDF는 OCR 없이 바로
+      if (r.text) { setPct(null); setFromOcr(false); showMasked(r.text); return } // 글자가 들어 있는 PDF는 OCR 없이 바로
       setPreview(r.images[0]); await runOcr(r.images)
     } catch (e) {
       setPct(null); setRetry('PDF를 읽지 못했습니다: ' + (e instanceof Error ? e.message : ''))
@@ -151,7 +225,7 @@ export default function StepContract() {
           <TabsContent value="paste" className="grid gap-3 pt-3">
             <Textarea rows={8} value={pasteText} onChange={(e) => setPasteText(e.target.value)} placeholder="계약서 내용을 붙여넣으세요" />
             <div>
-              <Button variant="outline" onClick={() => { if (pasteText.trim().length < 20) alert('계약서 내용을 붙여넣어 주세요.'); else showMasked(pasteText) }}>이 텍스트로 진행</Button>
+              <Button variant="outline" onClick={() => { if (pasteText.trim().length < 20) alert('계약서 내용을 붙여넣어 주세요.'); else { setFromOcr(false); showMasked(pasteText) } }}>이 텍스트로 진행</Button>
             </div>
           </TabsContent>
         </Tabs>
@@ -165,6 +239,17 @@ export default function StepContract() {
               <li>가려지지 않은 개인정보가 있으면 지운 뒤 분석하세요.</li>
               <li>고친 내용은 <b className="text-foreground">다시 분석하기</b>로 바로 반영돼요.</li>
             </ul>
+            {fromOcr && keyNumbers(masked).length > 0 && (
+              <div className="grid gap-1.5 rounded-lg border border-amber-500/50 bg-amber-500/10 p-3 text-sm">
+                <p className="font-semibold">ⓘ 사진에서 읽은 핵심 숫자 — 계약서 사진과 같은지 확인하세요</p>
+                <dl className="grid gap-1 sm:grid-cols-2">
+                  {keyNumbers(masked).map((k) => (
+                    <div key={k.label} className="flex gap-2"><dt className="shrink-0 text-muted-foreground">{k.label}</dt><dd className="font-semibold">{k.value}</dd></div>
+                  ))}
+                </dl>
+                <p className="text-[13px] text-muted-foreground">다르면 아래 글에서 직접 고친 뒤 분석하세요. 분석 결과는 이 숫자를 기준으로 나와요.</p>
+              </div>
+            )}
             <Textarea ref={taRef} rows={11} value={masked} onChange={(e) => setMasked(e.target.value)} />
             {/* 분석 전엔 주요 버튼, 분석 후엔 아래 "다음 단계" 버튼에 주요 자리를 넘김(한 화면에 파란 버튼 1개만) */}
             <div className="flex flex-wrap items-center gap-3">
@@ -197,55 +282,75 @@ export default function StepContract() {
   )
 }
 
+const SEV_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 }
+
 function AnalysisView({ a, onDispute, onRemove }: { a: Analysis; onDispute: () => void; onRemove: (i: number) => void }) {
+  // 위험한 것부터 보이도록 정렬 (빼기 버튼은 원래 순서 번호로 동작)
+  const sorted = a.clauses.map((c, i) => ({ c, i })).sort((x, y) => (SEV_ORDER[x.c.severity] ?? 2) - (SEV_ORDER[y.c.severity] ?? 2))
+  const count = (s: string) => a.clauses.filter((c) => c.severity === s).length
   return (
     <div className="grid gap-3">
-      <h3 className="flex items-center gap-2 font-semibold">
+      <h3 className="flex flex-wrap items-center gap-2 font-semibold">
         <ClipboardList className="size-4 text-muted-foreground" /> 분석 결과 {a.demo ? <Badge variant="outline">규칙 기반 점검</Badge> : <Badge>AI 분석</Badge>}
       </h3>
-      {a.summary && <p className="text-sm">{a.summary}</p>}
-      <p className="text-[13px] text-muted-foreground">
-        {a.rag?.used ? <>법령 근거 검색 <b className="text-foreground">사용</b> · 참고한 조문 {a.rag.sources.length}개{a.rag.sources.length ? `: ${a.rag.sources.join(', ')}` : ''}</> : <>법령 근거 검색 <b className="text-foreground">미사용</b> (AI 단독 판단)</>}
-      </p>
-      <p className="text-[13px] text-muted-foreground">AI 분석은 틀릴 수 있어요. 결과가 이상하면 위에서 계약서 글자를 고치고 “다시 분석하기”를 눌러 보세요.</p>
-      {a.clauses.length === 0 && <p className="text-sm text-muted-foreground">문제 소지가 있는 조항이 발견되지 않았습니다.</p>}
-      <div className="flex flex-wrap items-center gap-2">
-        <Button variant="outline" size="sm" onClick={onDispute}>이 분석이 맞지 않아요 · 계약서 내용 수정</Button>
-        <span className="text-[13px] text-muted-foreground">뺀 지적은 진정서에도 반영되지 않아요. “다시 분석하기”를 누르면 되돌아와요.</span>
+      {/* 한눈에 보는 요약: 몇 건이 얼마나 심각한지 먼저 */}
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border p-3 text-sm">
+        <span className={`rounded-full px-2.5 py-0.5 text-[13px] font-bold ${SEV.high.cls}`}>{SEV.high.label} {count('high')}건</span>
+        <span className={`rounded-full px-2.5 py-0.5 text-[13px] font-bold ${SEV.medium.cls}`}>{SEV.medium.label} {count('medium')}건</span>
+        <span className={`rounded-full px-2.5 py-0.5 text-[13px] font-bold ${SEV.low.cls}`}>{SEV.low.label} {count('low')}건</span>
+        {!!a.missing?.length && <span className="text-[13px] text-muted-foreground">· 빠진 항목 {a.missing.length}개</span>}
       </div>
-      {a.clauses.map((c, i) => (
-        <div key={i} className={`rounded-xl border border-l-4 p-4 ${c.severity === 'high' ? 'border-l-destructive' : c.severity === 'medium' ? 'border-l-amber-500' : 'border-l-slate-400'}`}>
-          <div className="flex items-center gap-2">
-            <span className={`rounded-full px-2.5 py-0.5 text-[13px] font-bold ${(SEV[c.severity] ?? SEV.low).cls}`}>{(SEV[c.severity] ?? SEV.low).label}</span>
-            <b>{c.title}</b>
-          </div>
-          {c.quote && <blockquote className="mt-2 rounded-md bg-muted px-3 py-1.5 text-[13px] text-muted-foreground">“{c.quote}”</blockquote>}
-          <p className="mt-2 text-sm">{c.issue}</p>
-          {(() => {
-            const lv = c.evidence || c.lawText ? '근거 충분' : a.rag?.used ? '현재 정보로 판단 어려움' : '추가 확인 필요'
-            return <p className="mt-2 text-[13px]"><Badge variant="outline">{lv}</Badge> <span className="text-muted-foreground">{CERTAINTY[c.severity] ?? CERTAINTY.low}</span></p>
-          })()}
-          {a.rag?.used && (c.evidence
-            ? <p className="mt-1 text-[13px]"><b>검색된 근거</b> <span className="text-muted-foreground">{c.evidence.title} — {c.evidence.text}</span></p>
-            : <p className="mt-1 text-[13px] text-amber-800">근거 자료에서 확인되지 않아 단정하지 않았어요. 전문가에게 확인해 보세요.</p>)}
-          {c.law && <p className="mt-1 text-[13px] font-medium text-primary">{c.law}</p>}
-          <Button variant="ghost" size="sm" className="mt-1 h-auto px-0 text-[13px] text-muted-foreground" onClick={() => onRemove(i)}>이 지적이 맞지 않아요</Button>
-          {c.lawText && (
-            <Accordion className="mt-2 rounded-lg border bg-muted/40 px-3">
+      {a.summary && <p className="text-base leading-relaxed">{a.summary}</p>}
+      {a.clauses.length === 0 && <p className="text-sm text-muted-foreground">문제 소지가 있는 조항이 발견되지 않았습니다.</p>}
+      {sorted.map(({ c, i }) => {
+        const lv = c.evidence || c.lawText ? '근거 충분' : a.rag?.used ? '현재 정보로 판단 어려움' : '추가 확인 필요'
+        return (
+          <div key={i} className={`grid gap-3 rounded-xl border border-l-4 p-4 ${c.severity === 'high' ? 'border-l-destructive' : c.severity === 'medium' ? 'border-l-amber-500' : 'border-l-slate-400'}`}>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`rounded-full px-2.5 py-0.5 text-[13px] font-bold ${(SEV[c.severity] ?? SEV.low).cls}`}>{(SEV[c.severity] ?? SEV.low).label}</span>
+              <b className="text-base">{c.title}</b>
+              <Badge variant="outline" className="ml-auto">{lv}</Badge>
+            </div>
+            {c.quote && (
+              <div>
+                <p className="text-[13px] font-semibold text-muted-foreground">계약서에 적힌 문장</p>
+                <blockquote className="mt-1 rounded-md bg-muted px-3 py-2 text-sm">“{c.quote}”</blockquote>
+              </div>
+            )}
+            <div>
+              <p className="text-[13px] font-semibold text-muted-foreground">무엇이 문제인가요</p>
+              <p className="mt-1 text-sm leading-relaxed">{c.issue}</p>
+            </div>
+            {c.law && (
+              <div>
+                <p className="text-[13px] font-semibold text-muted-foreground">법 기준</p>
+                <p className="mt-1 text-sm font-medium text-primary">{c.law}</p>
+              </div>
+            )}
+            <Accordion className="rounded-lg border bg-muted/40 px-3">
               <AccordionItem value="law" className="border-0">
                 <AccordionTrigger className="py-2 text-[13px] font-semibold text-primary">
-                  <span className="flex items-center gap-1.5"><BookOpen className="size-3.5" /> 조문 원문 보기 · {c.lawText.name} {c.lawText.article}{c.lawText.title ? `(${c.lawText.title})` : ''}</span>
+                  <span className="flex items-center gap-1.5"><BookOpen className="size-3.5" /> 근거 자세히 보기{c.lawText ? ` · ${c.lawText.name} ${c.lawText.article}` : ''}</span>
                 </AccordionTrigger>
-                <AccordionContent>
-                  <p className="whitespace-pre-wrap text-[13px] leading-relaxed">{c.lawText.text}</p>
-                  <p className="mt-2 text-[13px] text-muted-foreground">출처: 법제처 국가법령정보센터 (참고용 · 최신 원문은 law.go.kr에서 확인)</p>
-                  <a className="mt-1 inline-block text-[13px] font-medium text-primary underline" href={`https://www.law.go.kr/법령/${encodeURIComponent(c.lawText.name)}`} target="_blank" rel="noreferrer">공식 출처 보기</a>
+                <AccordionContent className="grid gap-2 text-[13px] leading-relaxed">
+                  <p className="text-muted-foreground">{CERTAINTY[c.severity] ?? CERTAINTY.low}</p>
+                  {a.rag?.used && (c.evidence
+                    ? <p><b>검색된 근거</b> <span className="text-muted-foreground">{c.evidence.title} — {c.evidence.text}</span></p>
+                    : <p className="text-amber-800">근거 자료에서 확인되지 않아 단정하지 않았어요. 전문가에게 확인해 보세요.</p>)}
+                  {c.lawText && (
+                    <>
+                      <p className="font-semibold">{c.lawText.name} {c.lawText.article}{c.lawText.title ? `(${c.lawText.title})` : ''}</p>
+                      <p className="whitespace-pre-wrap">{c.lawText.text}</p>
+                      <p className="text-muted-foreground">출처: 법제처 국가법령정보센터 (참고용 · 최신 원문은 law.go.kr에서 확인) <a className="font-medium text-primary underline" href={`https://www.law.go.kr/법령/${encodeURIComponent(c.lawText.name)}`} target="_blank" rel="noreferrer">공식 출처 보기</a></p>
+                    </>
+                  )}
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
-          )}
-        </div>
-      ))}
+            <Button variant="ghost" size="sm" className="h-auto justify-self-start px-0 text-[13px] text-muted-foreground" onClick={() => onRemove(i)}>이 지적이 맞지 않아요 (빼기)</Button>
+          </div>
+        )
+      })}
       {!!a.missing?.length && (
         <div className="grid gap-2">
           <h4 className="text-sm font-semibold">계약서에 없거나 확인이 안 된 항목</h4>
@@ -253,6 +358,13 @@ function AnalysisView({ a, onDispute, onRemove }: { a: Analysis; onDispute: () =
           <p className="text-[13px] text-muted-foreground">근로계약서에는 임금, 소정근로시간, 휴일, 연차휴가 등이 명시되어야 합니다. (근로기준법 제17조)</p>
         </div>
       )}
+      <div className="grid gap-1.5 border-t pt-3 text-[13px] text-muted-foreground">
+        <p>
+          {a.rag?.used ? <>법령 근거 검색 사용 · 참고한 조문 {a.rag.sources.length}개{a.rag.sources.length ? `: ${a.rag.sources.join(', ')}` : ''}</> : <>법령 근거 검색 미사용 (AI 단독 판단)</>}
+        </p>
+        <p>AI 분석은 틀릴 수 있어요. 뺀 지적은 진정서에도 반영되지 않고, “다시 분석하기”를 누르면 되돌아와요.</p>
+        <Button variant="outline" size="sm" className="justify-self-start" onClick={onDispute}>이 분석이 맞지 않아요 · 계약서 내용 수정</Button>
+      </div>
     </div>
   )
 }

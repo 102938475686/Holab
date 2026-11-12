@@ -26,7 +26,7 @@ function Bubble({ onLaw }: { onLaw: () => void }) {
       <span aria-hidden="true" className="absolute -top-2 left-1/2 size-4 -translate-x-1/2 rotate-45 border-l border-t border-primary/30 bg-card" />
       {!known ? (
         <div className="grid gap-2.5">
-          <p><b>안녕하세요, 저는 올랍이예요!</b></p>
+          <p><b>안녕하세요, 저는 올랍이예요!</b> <span className="text-muted-foreground">HoLab 안에서 길을 안내하는 AI 도우미예요.</span></p>
           <p className="text-muted-foreground">어디서부터 해야 할지 모르겠다면 저에게 상황을 말해 주세요. 지금 쓰면 좋은 기능을 순서대로 알려 드릴게요.</p>
           <Button size="sm" onClick={() => setConsultOpen(true)}><MessageCircle /> 내 상황 이야기하기</Button>
         </div>

@@ -61,6 +61,7 @@ export default function StepLawyer() {
   const [receipt, setReceipt] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [sentTo, setSentTo] = useState('')
+  const [mailedCenter, setMailedCenter] = useState<string | null>(null) // 메일 전송이 끝난 센터 → 상담 준비의 "1. 이메일 보내기" 완료 처리
   const [myLoc, setMyLoc] = useState<{ lat: number; lon: number } | null>(null)
   const [locBusy, setLocBusy] = useState(false)
   const [locErr, setLocErr] = useState<string | null>(null)
@@ -304,7 +305,7 @@ export default function StepLawyer() {
       }
       await sleep(500)
       setProgress(3)
-      setReceipt(no); setPhase('done'); markDone(4)
+      setReceipt(no); setPhase('done'); markDone(4); setMailedCenter(target?.name ?? null)
     } catch (e) {
       setError(e instanceof Error ? e.message : '전송 중 오류가 발생했습니다.')
       setPhase('confirm')
@@ -364,9 +365,17 @@ export default function StepLawyer() {
             {locErr && <p className="text-[13px] text-destructive">{locErr} 위의 “직접 선택”으로 사는 구를 고른 뒤 다시 눌러 주세요.</p>}
           </div>          <CenterMap centers={mapCenters} selected={sel} onSelect={(n) => pick(n)} me={myLoc} />
           <p className="text-[13px] text-muted-foreground"><MapPin className="mr-1 inline size-3.5" />핀이나 목록에서 센터를 고르세요. 지도 타일은 OpenStreetMap에서 불러오며, 내 위치는 이 기기 밖으로 보내지 않아요.</p>
+          {/* 추천 순서 이유를 한 문장으로 먼저 보여 주고, 계산 방법은 "자세히 보기"로 */}
           <details className="rounded-lg border p-3 text-[13px]">
-            <summary className="cursor-pointer font-semibold">
-              {sortByDistance && myLoc ? '지금은 거리순이에요' : '지금은 기본 순서예요'} · 왜 이 순서인가요?
+            <summary className="cursor-pointer list-none">
+              <span className="font-semibold text-foreground">추천 순서 이유</span>{' '}
+              <span className="text-muted-foreground">
+                {sortByDistance && myLoc
+                  ? `${myDistrict ? `고른 구(${myDistrict})` : '내 위치'}에서 가까운 센터부터 보여 드려요.`
+                  : myDistrict ? `고른 구(${myDistrict})의 센터를 먼저, 그다음 서울시 광역 센터 순서예요.` : '위치를 알려 주시면 가까운 순으로 바꿔 드려요. 지금은 서울시 광역 센터부터 보여 드려요.'}
+                {need.length ? ` 센터 안 노무사는 내 사건 분야(${need.join('·')})와 잘 맞는 순서예요.` : ''}
+              </span>{' '}
+              <span className="font-semibold text-primary underline underline-offset-2">자세히 보기</span>
             </summary>
             <div className="mt-2 grid gap-1.5 text-muted-foreground">
               <p><b className="text-foreground">센터 순서</b> — {sortByDistance && myLoc ? '내 위치(또는 고른 구)에서 가까운 센터부터예요.' : '위치를 알려 주면 가까운 순으로 바꿔 드려요. 지금은 고른 구 → 서울시 광역 센터 → 공개 자료 순서예요.'}</p>
@@ -444,7 +453,7 @@ export default function StepLawyer() {
           <CounselPrep
             center={reportCenter} lawyer={chosenLw} dist={list.find((x) => x.name === reportCenter.name)?.dist ?? null} chosen={!!sel}
             openReport={openReport} reportBusy={reportBusy} reportSaved={reportSaved} saveComplaintPdf={saveComplaintPdf} cmpBusy={cmpBusy}
-            mail={{ realMail, to: toAddr, setTo: setToAddr, valid: validMail(toAddr), onSend: open }}
+            mail={{ realMail, to: toAddr, setTo: setToAddr, valid: validMail(toAddr), onSend: open, sentFor: mailedCenter }}
           />
         )}
         <p className="text-[13px] text-muted-foreground">

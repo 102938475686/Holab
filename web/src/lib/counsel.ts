@@ -98,6 +98,7 @@ export interface Reservation {
   time: string // HH:MM
   checks: string[] // 챙겼다고 체크한 준비물
   seen: string[] // 마무리 인사를 이미 보여 준 상태('booked'·'done') — 같은 센터에서 반복해 띄우지 않으려고
+  mailed?: boolean // 진행 1단계: 노무사에게 이메일을 보냈거나(전화 등으로) 건너뛰었음
 }
 const KEY = 'holab-reservations-v1'
 const blank = (): Reservation => ({ method: '', status: 'before', date: '', time: '', checks: [], seen: [] })

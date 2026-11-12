@@ -18,7 +18,7 @@ import { useStore } from '@/store'
 
 const NUM_FIELDS: [keyof CalcInput, string, string, string][] = [
   ['hourly', '시급 (원)', '예: 10320', '계약서·급여명세서 기준'],
-  ['weekly', '주 근로시간 (계약)', '예: 20', '휴게시간 제외'],
+  ['weekly', '주 근로시간 (계약)', '예: 20', '휴게·연장 시간 제외, 일하기로 정한 시간'],
   ['months', '일한 기간 (개월)', '예: 3', '대략이어도 돼요'],
   ['ot', '주당 연장 시간', '없으면 비움', ''],
   ['night', '주당 야간 시간 (22~06시)', '없으면 비움', ''],
@@ -98,6 +98,42 @@ function useAiJudge(calc: CalcResult | null) {
   }, [key]) // eslint-disable-line react-hooks/exhaustive-deps
   return { loading: !!calc && res?.key !== key, ai: res?.key === key ? res.data : null }
 }
+// 계약서·급여명세서가 없거나 금액을 모를 때: 어떻게 진행하면 되는지 + 통장 입금액으로 시급 어림하기
+function NoAmountHelp({ onHourly }: { onHourly: (v: number) => void }) {
+  const [open, setOpen] = useState(false)
+  const [pay, setPay] = useState('')
+  const [hours, setHours] = useState('')
+  const est = +pay > 0 && +hours > 0 ? Math.round(+pay / +hours) : 0
+  return (
+    <div className="rounded-xl border border-dashed p-3 text-sm">
+      <button type="button" aria-expanded={open} onClick={() => setOpen((v) => !v)} className="flex w-full items-center gap-2 text-left font-semibold">
+        <CircleHelp className="size-4 shrink-0 text-primary" /> 계약서나 급여명세서가 없어서 금액을 모르겠어요
+        <span className="ml-auto text-[13px] font-normal text-primary">{open ? '닫기' : '방법 보기'}</span>
+      </button>
+      {open && (
+        <div className="mt-3 grid gap-3">
+          <ol className="list-decimal space-y-1 pl-5 text-muted-foreground">
+            <li><b className="text-foreground">통장 입금액으로 어림해요.</b> 한 달에 들어온 월급 ÷ 그 달에 일한 시간 = 대략의 시급이에요. 아래에서 바로 계산해 드려요.</li>
+            <li><b className="text-foreground">채용 공고·문자·카톡을 찾아봐요.</b> “시급 ○○원”이라고 적힌 대화나 공고 캡처가 있으면 그 금액을 쓰세요.</li>
+            <li><b className="text-foreground">그래도 모르면 최저임금({MIN_WAGE.toLocaleString()}원)으로 계산해요.</b> 그러면 결과는 “적어도 이만큼은 받아야 한다”는 최소 금액이에요.</li>
+            <li><b className="text-foreground">급여명세서는 요청할 수 있어요.</b> 사업주는 임금을 줄 때 임금명세서를 줘야 해요(근로기준법 제48조). 받은 적이 없다면 그것도 상담 내용이 돼요.</li>
+          </ol>
+          <div className="grid gap-2 rounded-lg bg-muted/50 p-3">
+            <b className="text-[13px]">통장 입금액으로 시급 어림하기</b>
+            <div className="flex flex-wrap items-end gap-2">
+              <label className="grid gap-1 text-[13px] text-muted-foreground">한 달에 들어온 돈 (원)<Input type="number" min={0} value={pay} onChange={(e) => setPay(e.target.value)} placeholder="예: 800000" className="h-9 w-40" /></label>
+              <label className="grid gap-1 text-[13px] text-muted-foreground">그 달에 일한 시간<Input type="number" min={0} value={hours} onChange={(e) => setHours(e.target.value)} placeholder="예: 86" className="h-9 w-32" /></label>
+              <Button size="sm" variant="outline" disabled={!est} onClick={() => onHourly(est)}>{est ? `시급 약 ${est.toLocaleString()}원으로 채우기` : '두 칸을 입력하세요'}</Button>
+              <Button size="sm" variant="ghost" onClick={() => onHourly(MIN_WAGE)}>최저임금으로 채우기</Button>
+            </div>
+            <p className="text-[13px] text-muted-foreground">세금·4대보험이 빠진 금액이면 실제 시급보다 조금 낮게 나와요. 주휴수당이 섞여 있을 수도 있으니 결과는 어림값으로 봐 주세요.</p>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function StepCalc() {
   const { calcIn, setCalcIn, calc, runCalc, go, calcAuto, setCalcAuto, masked, pasteText, analysis, setNextRec } = useStore()
   const bad = !!calc && calc.total > 0
@@ -134,6 +170,7 @@ export default function StepCalc() {
             <Button variant="ghost" size="sm" className="ml-auto h-auto px-2 py-1 text-[13px]" onClick={() => setCalcAuto([])}>확인했어요</Button>
           </div>
         )}
+        <NoAmountHelp onHourly={(v) => setCalcIn({ hourly: String(v) })} />
         <div className="grid gap-4 sm:grid-cols-3">
           {NUM_FIELDS.map(([k, label, ph, hint]) => (
             <Field key={k} label={label}>
@@ -251,7 +288,7 @@ export default function StepCalc() {
                 const showTotal = w > 0
                 const rows: [string, number | string, number | string, boolean?][] = [
                   [`기본급 (${calc.legalHourly.toLocaleString()}원${calc.legalHourly > calc.hourly ? ' · 최저임금 기준' : ''} × 주 ${calc.weekly}시간)`, calc.basePay * WPM, calc.basePay * w],
-                  [`주휴수당 (주 ${calc.holHours.toFixed(1)}시간분${calc.missedWeeks > 0 ? `, 빠진 ${Math.round(calc.missedWeeks * 10) / 10}주 제외` : ''})`, calc.eligible ? calc.monthlyHolPay : '해당 없음', calc.eligible ? calc.weeklyHolPay * calc.holWeeks : '해당 없음'],
+                  [calc.weekly < 15 ? '주휴수당 (주 15시간 미만이라 대상 아님)' : `주휴수당 (주 ${Math.min(calc.weekly, 40)}시간 ÷ 40 × 8시간 = 주 ${calc.holHours.toFixed(1)}시간분 × ${calc.legalHourly.toLocaleString()}원${calc.missedWeeks > 0 ? `, 빠진 ${Math.round(calc.missedWeeks * 10) / 10}주 제외` : ''})`, calc.eligible ? calc.monthlyHolPay : '해당 없음', calc.eligible ? calc.weeklyHolPay * calc.holWeeks : '해당 없음'],
                 ]
                 if (calc.ot + calc.hol > 0) rows.push(['연장·휴일 근로 기본급', (calc.ot + calc.hol) * calc.legalHourly * WPM, (calc.ot + calc.hol) * calc.legalHourly * w])
                 rows.push(['연장·야간·휴일 가산수당 (+50%)', calc.under5 ? '5인 미만 – 미적용' : calc.extraWeekly * WPM, calc.under5 ? '5인 미만 – 미적용' : calc.extraWeekly * w])

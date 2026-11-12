@@ -50,7 +50,8 @@ export function calculate(i: CalcInput): CalcResult | null {
   const basePay = legalHourly * weekly
 
   const minWageGap = Math.max(0, MIN_WAGE - hourly)
-  const minWageUnpaid = minWageGap * weekly * weeks
+  // 최저임금 차액: 계약 시급으로 이미 받은 시간(소정근로 + 연장·휴일 근로 기본급 + 받은 주휴수당)에 대해 최저임금과의 차이
+  const minWageUnpaid = minWageGap * ((weekly + ot + hol) * weeks + (i.holidayPaid ? holHours * holWeeks : 0))
   const holUnpaid = i.holidayPaid ? 0 : weeklyHolPay * holWeeks
   const extraUnpaid = i.extraPaid ? 0 : extraWeekly * weeks
   const total = holUnpaid + extraUnpaid + minWageUnpaid
