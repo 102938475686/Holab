@@ -18,6 +18,25 @@ const PORT = process.env.PORT || 3000;
 const MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 const hasKey = () => !!process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('여기에');
 
+// AI 모델은 학습 시점의 옛 최저임금(예: 2023년 9,620원)을 말할 수 있어서, 모든 AI 호출 앞에 기준 정보를 붙여요.
+// 해마다 최저임금이 바뀌면 이 값과 web/src/lib/calc.ts의 MIN_WAGE를 함께 고치세요.
+const BASE_FACTS = `[기준 정보 — 학습한 지식과 다르면 반드시 이 값을 따르세요]
+- 지금은 2026년입니다. "올해", "현재", "지금" 최저임금은 2026년 기준입니다.
+- 2026년 최저임금: 시급 10,320원 (주 40시간 근무 시 월 환산 2,156,880원, 월 209시간 기준).
+- 지난 최저임금(사용자가 그 연도를 직접 물을 때만 사용): 2025년 10,030원, 2024년 9,860원, 2023년 9,620원.
+
+`;
+// 그래도 "최저임금 9,620원"처럼 옛 금액을 현재 금액처럼 쓰면 2026년 금액으로 바로잡아요 (연도를 밝힌 경우는 그대로 둠)
+function fixOldWage(s) {
+  return String(s).replace(/(9,?620|9,?860|10,?030)(\s*원)/g, (m, num, won, off, str) => {
+    const before = str.slice(Math.max(0, off - 40), off);
+    // "최저임금(은/: /시급 ) 9,620원"처럼 최저임금 금액을 말하는 경우만. "최저임금보다 낮은 9,620원"(실제 받은 돈)은 건드리지 않음
+    const near = before.match(/최저\s*(?:임금|시급)([^.\n]{0,14})$/);
+    if (!near || /보다|미달|낮|못|안 되|부족/.test(near[1]) || /20(23|24|25)\s*년/.test(before)) return m;
+    return '10,320' + won;
+  });
+}
+
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.json': 'application/json; charset=utf-8', '.woff2': 'font/woff2', '.woff': 'font/woff', '.wasm': 'application/wasm', '.map': 'application/json' };
 // 새 화면(React + shadcn)은 web/dist, 없으면 기존 public 화면을 사용
 const WEB_DIST = path.join(__dirname, 'web', 'dist');
@@ -43,13 +62,13 @@ async function callOpenAI(system, user, json) {
       model: MODEL,
       temperature: 0.2,
       ...(json ? { response_format: { type: 'json_object' } } : {}),
-      messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
+      messages: [{ role: 'system', content: BASE_FACTS + system }, { role: 'user', content: user }],
     }),
   });
   clearTimeout(timer);
   if (!res.ok) throw new Error('OpenAI ' + res.status + ' ' + (await res.text()).slice(0, 200));
   const data = await res.json();
-  return data.choices[0].message.content;
+  return fixOldWage(data.choices[0].message.content);
 }
 
 // ---------- 규칙 기반 대체 분석 (키 없음/호출 실패 시) ----------
@@ -601,10 +620,10 @@ async function handler(req, res) {
         const r = await fetch('https://api.openai.com/v1/chat/completions', {
           signal: AbortSignal.timeout(40000), method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + process.env.OPENAI_API_KEY },
-          body: JSON.stringify({ model: MODEL, temperature: 0.2, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: system }, ...msgs] }),
+          body: JSON.stringify({ model: MODEL, temperature: 0.2, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: BASE_FACTS + system }, ...msgs] }),
         });
         if (!r.ok) throw new Error('OpenAI ' + r.status);
-        const out = JSON.parse((await r.json()).choices[0].message.content);
+        const out = JSON.parse(fixOldWage((await r.json()).choices[0].message.content));
         if (process.env.DEBUG_TRIAGE) console.error('[triage raw]', JSON.stringify(out));
         const list = (a, n, len) => (Array.isArray(a) ? a : []).map((x) => String(x).slice(0, len)).filter(Boolean).slice(0, n);
         const seen = new Set();
@@ -833,11 +852,11 @@ async function handler(req, res) {
           headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + process.env.OPENAI_API_KEY },
           body: JSON.stringify({
             model: MODEL, temperature: 0.3, response_format: { type: 'json_object' },
-            messages: [{ role: 'system', content: SYS_COMPLAINT_CHAT + '\n\n[facts] ' + JSON.stringify(facts).slice(0, 2000) }, ...msgs],
+            messages: [{ role: 'system', content: BASE_FACTS + SYS_COMPLAINT_CHAT + '\n\n[facts] ' + JSON.stringify(facts).slice(0, 2000) }, ...msgs],
           }),
         });
         if (!r.ok) throw new Error('OpenAI ' + r.status);
-        const out = JSON.parse((await r.json()).choices[0].message.content);
+        const out = JSON.parse(fixOldWage((await r.json()).choices[0].message.content));
         const notes = (Array.isArray(out.notes) ? out.notes : []).map((x) => String(x).slice(0, 300)).filter(Boolean).slice(0, 12);
         let reply = String(out.reply || '').trim();
         let ready = !!out.ready;

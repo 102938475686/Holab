@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import ComplaintDoc from '@/components/ComplaintDoc'
 import HelpPage from '@/components/HelpPage'
 import Home from '@/components/Home'
+import PrivacyConsent from '@/components/PrivacyConsent'
 import TriageAssistant from '@/components/TriageAssistant'
 import ReportDoc from '@/components/ReportDoc'
 import Wizard from '@/components/Wizard'
@@ -18,6 +19,7 @@ function Shell() {
         <div className="sticky top-0 z-30 flex min-h-10 items-center justify-center gap-2 border-b border-amber-200 bg-amber-50 px-3 py-1.5 text-center text-[13px] text-amber-950">
           <Scale className="size-4 shrink-0" />
           <span>이 서비스는 <b>참고용 정보</b>이며 <b>법률 자문이 아닙니다</b>. 중요한 결정은 노무사·노동청과 상담하세요.</span>
+          <PrivacyConsent />
         </div>
         {view === 'home' && <Home />}
         {view === 'help' && <HelpPage />}

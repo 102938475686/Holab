@@ -503,7 +503,10 @@ export default function StepLawyer() {
               <div className="flex items-start gap-2.5 rounded-lg bg-muted/60 p-3">
                 <Checkbox id="agree2" checked={agree} onCheckedChange={(v) => setAgree(!!v)} className="mt-0.5" />
                 <Label htmlFor="agree2" className="cursor-pointer font-normal leading-relaxed">
-                  <span>위 내용이 <b>{toAddr.trim() || '입력한 주소'}</b>로 이메일 전송되는 데 동의하며, 이는 법률 자문이 아닌 <b>참고용 초안</b>임을 확인했습니다.</span>
+                  <span>
+                    <b>[개인정보 제3자 제공 동의]</b> 위 메일과 첨부 진정서 PDF에 적힌 내 정보(이름·연락처·사건 내용 등)를 <b>{toAddr.trim() || '입력한 주소'}</b>에 <b>노동 상담·예약 목적</b>으로 보내는 데 동의해요.
+                    받는 쪽은 상담에 필요한 동안 이 정보를 보관해요. 동의하지 않으면 보내지 않아요. 이 메일은 법률 자문이 아닌 <b>참고용 초안</b>이에요.
+                  </span>
                 </Label>
               </div>
               <DialogFooter>
