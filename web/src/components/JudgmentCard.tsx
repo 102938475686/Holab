@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Fold } from '@/components/common'
 import { ArrowRight, ChevronDown, Sparkles } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -59,12 +60,7 @@ export default function JudgmentCard({
             </div>
           )}
           {children && (
-            <details className="group mt-3 rounded-lg bg-background/70 p-3">
-              <summary className="flex cursor-pointer list-none items-center gap-1 text-sm font-semibold text-muted-foreground">
-                판단 근거 자세히 보기 <ChevronDown className="size-4 transition-transform group-open:rotate-180" />
-              </summary>
-              <div className="mt-2 grid gap-2 leading-relaxed">{children}</div>
-            </details>
+            <Fold title="판단 근거 자세히 보기" sub="HoLab이 이렇게 판단한 이유" size="md" className="mt-3" bodyClassName="grid gap-2 leading-relaxed">{children}</Fold>
           )}
         </div>
       )}

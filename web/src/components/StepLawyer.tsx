@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Fold } from '@/components/common'
 import ReportDoc from '@/components/ReportDoc'
 import { loadReservation } from '@/lib/counsel'
 import { ArrowRight, Check, CheckCircle2, ClipboardList, FileDown, Loader2, Mail, MapPin, Navigation, Phone, Receipt, Send, Sparkles, TriangleAlert } from 'lucide-react'
@@ -366,18 +367,13 @@ export default function StepLawyer() {
           </div>          <CenterMap centers={mapCenters} selected={sel} onSelect={(n) => pick(n)} me={myLoc} />
           <p className="text-sm text-muted-foreground"><MapPin className="mr-1 inline size-3.5" />핀이나 목록에서 센터를 고르세요. 지도 타일은 OpenStreetMap에서 불러오며, 내 위치는 이 기기 밖으로 보내지 않아요.</p>
           {/* 추천 순서 이유를 한 문장으로 먼저 보여 주고, 계산 방법은 "자세히 보기"로 */}
-          <details className="rounded-lg border p-3 text-sm">
-            <summary className="cursor-pointer list-none">
-              <span className="font-semibold text-foreground">추천 순서 이유</span>{' '}
-              <span className="text-muted-foreground">
+          <Fold title="추천 순서 이유" bodyClassName="text-sm" sub={<>
                 {sortByDistance && myLoc
                   ? `${myDistrict ? `고른 구(${myDistrict})` : '내 위치'}에서 가까운 센터부터 보여 드려요.`
                   : myDistrict ? `고른 구(${myDistrict})의 센터를 먼저, 그다음 서울시 광역 센터 순서예요.` : '위치를 알려 주시면 가까운 순으로 바꿔 드려요. 지금은 서울시 광역 센터부터 보여 드려요.'}
                 {need.length ? ` 센터 안 노무사는 내 사건 분야(${need.join('·')})와 잘 맞는 순서예요.` : ''}
-              </span>{' '}
-              <span className="font-semibold text-primary underline underline-offset-2">자세히 보기</span>
-            </summary>
-            <div className="mt-2 grid gap-1.5 text-muted-foreground">
+              </>}>
+            <div className="grid gap-1.5 text-muted-foreground">
               <p><b className="text-foreground">센터 순서</b> — {sortByDistance && myLoc ? '내 위치(또는 고른 구)에서 가까운 센터부터예요.' : '위치를 알려 주면 가까운 순으로 바꿔 드려요. 지금은 고른 구 → 서울시 광역 센터 → 공개 자료 순서예요.'}</p>
               <p><b className="text-foreground">노무사 적합도</b> — 센터를 고르면 그 안의 노무사를 적합도 순으로 보여 줘요.</p>
               <ol className="list-decimal space-y-0.5 pl-5">
@@ -388,7 +384,7 @@ export default function StepLawyer() {
               <p><b className="text-foreground">임시 데이터 안내</b> — 노무사 이름·분야·이메일은 시연용 가상 정보예요. 센터와 연락처는 실제 공개 자료이고, 실제 서비스에서는 센터에서 확인한 노무사 정보로 바꿔요.</p>
               <p><b className="text-foreground">모든 센터가 공통으로 다루는 상담</b> — {COMMON_SCOPE}.{issueText && <> 지금 확인된 쟁점({issueText})도 이 범위 안이에요.</>}</p>
             </div>
-          </details>
+          </Fold>
 
           <div id="lawyer-list" className="grid gap-2">
             {(showAll ? list : list.slice(0, 3)).map((l, i) => {

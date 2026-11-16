@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { ChoiceField, Field, TextField } from '@/components/common'
+import { ChoiceField, Field, Fold, TextField } from '@/components/common'
 import ComplaintAssistant from '@/components/ComplaintAssistant'
 import { StepFooter } from '@/components/StepFooter'
 import { draftComplaint, judgeComplaint, type JudgeComplaintReply } from '@/lib/api'
@@ -149,9 +149,8 @@ export default function StepComplaint() {
       </CardHeader>
       <CardContent className="grid gap-6">
         {/* AI에 전달되는 사실관계를 항목별 목록으로: 초안을 만들기 전에 틀린 게 없는지 한눈에 확인 */}
-        <details className="group rounded-xl border p-4" open={sub === 4}>
-          <summary className="cursor-pointer text-sm font-semibold">AI에 전달되는 사실관계 확인하기 <span className="font-normal text-muted-foreground">(인적사항은 보내지 않아요)</span></summary>
-          <div className="mt-3 grid gap-3 text-sm">
+        <Fold title="AI에 전달되는 사실관계 확인하기" sub="이름·주민번호 같은 인적사항은 보내지 않아요" open={sub === 4} bodyClassName="grid gap-3 text-sm">
+          <div className="contents">
             {calc ? (
               <dl className="grid gap-x-6 gap-y-1.5 sm:grid-cols-2">
                 <div className="flex justify-between gap-3"><dt className="text-muted-foreground">시급</dt><dd>{calc.hourly.toLocaleString()}원</dd></div>
@@ -181,7 +180,7 @@ export default function StepComplaint() {
             )}
             <p className="text-sm text-muted-foreground">틀린 내용이 있으면 해당 단계(못 받은 돈 확인·계약서 분석)에서 고치거나, “있었던 일의 순서”를 수정하세요.</p>
           </div>
-        </details>
+        </Fold>
 
         <ol className="flex flex-wrap gap-1.5 text-sm" aria-label="진정서 작성 단계">
           {SUBS.map((s, i) => (

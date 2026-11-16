@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Sparkles } from 'lucide-react'
+import { ChevronDown, Sparkles } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -41,5 +41,22 @@ export function ChoiceField({ k, label, options, className }: { k: StrKeys; labe
         </SelectContent>
       </Select>
     </Field>
+  )
+}
+
+// 접기 상자: 상자 전체를 누르면 펼쳐지고, 굵은 제목 + 작은 설명 + 오른쪽 화살표로 통일
+export function Fold({ title, sub, open, size = 'lg', className, bodyClassName, onToggle, children }: { title: ReactNode; sub?: ReactNode; open?: boolean; size?: 'lg' | 'md'; className?: string; bodyClassName?: string; onToggle?: (open: boolean) => void; children: ReactNode }) {
+  const lg = size === 'lg'
+  return (
+    <details open={open} onToggle={onToggle ? (e) => onToggle((e.currentTarget as HTMLDetailsElement).open) : undefined} className={cn('group/fold rounded-xl border bg-background transition-colors hover:border-primary/40', className)}>
+      <summary className={cn('flex cursor-pointer list-none items-center gap-3 [&::-webkit-details-marker]:hidden', lg ? 'px-5 py-4' : 'px-4 py-3')}>
+        <span className="min-w-0 flex-1">
+          <span className={cn('block font-bold', lg ? 'text-lg' : 'text-base')}>{title}</span>
+          {sub && <span className="block text-sm font-normal text-muted-foreground">{sub}</span>}
+        </span>
+        <ChevronDown className={cn('shrink-0 text-primary transition-transform group-open/fold:rotate-180', lg ? 'size-6' : 'size-5')} />
+      </summary>
+      <div className={cn(lg ? 'px-5 pb-5' : 'px-4 pb-4', bodyClassName)}>{children}</div>
+    </details>
   )
 }

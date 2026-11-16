@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Fold } from '@/components/common'
 import { ArrowLeft, ArrowRight, ArrowUp, Bot, Scale, Search, Sparkles } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -221,9 +222,8 @@ export default function TriageAssistant() {
                         {state.rankingTentative && <p className="mt-2 text-sm text-muted-foreground">말씀하신 내용이 아직 적어서 잠정이에요. 질문에 답하면 더 정확해져요.</p>}
                       </div>
                       {rest.length > 0 && (
-                        <details className="group rounded-lg bg-background/70 p-3">
-                          <summary className="cursor-pointer list-none text-sm font-semibold text-muted-foreground">다른 추천 {rest.length}개 보기</summary>
-                          <div className="mt-2 grid gap-2">
+                        <Fold title={`다른 추천 ${rest.length}개 보기`} sub="함께 쓰면 좋은 기능" size="md">
+                          <div className="grid gap-2">
                             {rest.map((r, i) => (
                               <div key={r.key} className="flex flex-wrap items-center justify-between gap-2 border-t pt-2 first:border-t-0 first:pt-0">
                                 <div className="min-w-0 flex-1 text-sm"><b>{i + 2}순위 · {FEATURE[r.key].label.replace('하기', '')}</b><span className="block text-sm text-muted-foreground">{r.reason}</span></div>
@@ -231,7 +231,7 @@ export default function TriageAssistant() {
                               </div>
                             ))}
                           </div>
-                        </details>
+                        </Fold>
                       )}
                     </>
                   )

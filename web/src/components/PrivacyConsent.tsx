@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Fold } from '@/components/common'
 import { ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -87,16 +88,15 @@ export default function PrivacyConsent() {
             </Item>
             <Item title="3. AI에 보내는 정보 (국외 이전)">
               AI 상담·계약서 분석·진정서 초안은 <b className="text-foreground">OpenAI(미국)</b>의 AI가 처리해요. 보내기 전에 이름·전화번호·주민등록번호·주소·계좌번호는 <b className="text-foreground">[가림] 처리</b>해요.
-              <details className="mt-1.5 rounded-lg bg-muted/60 p-2.5">
-                <summary className="cursor-pointer font-medium text-foreground">자세히 보기</summary>
-                <ul className="mt-1.5 list-disc space-y-0.5 pl-4">
+              <Fold title="자세히 보기" sub="받는 곳 · 보내는 정보 · 보관 기간" size="md" className="mt-1.5">
+                <ul className="list-disc space-y-0.5 pl-4">
                   <li>받는 곳: OpenAI, L.L.C. (미국)</li>
                   <li>보내는 때와 방법: AI 기능을 쓸 때마다 암호화된 인터넷 연결로 전송</li>
                   <li>보내는 정보: 개인정보를 가린 상담 내용·계약서 내용·근무 조건</li>
                   <li>목적: 답변과 문서 초안 만들기</li>
                   <li>보관: OpenAI 정책상 AI 학습에 쓰지 않고, 남용 감시를 위해 최대 30일 보관 후 삭제</li>
                 </ul>
-              </details>
+              </Fold>
             </Item>
             <Item title="4. 다른 사람에게 보내는 경우 (제3자 제공)">
               노무사나 상담 센터에 이메일을 보낼 때만 보내요. 보내기 직전에 받는 사람과 보낼 내용을 직접 확인하고, 그때 <b className="text-foreground">따로 한 번 더 동의</b>를 받아요.

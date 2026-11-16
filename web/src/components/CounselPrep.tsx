@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Fold } from '@/components/common'
 import { evidenceList } from '@/lib/evidence'
 import { CalendarPlus, Check, ClipboardList, FileDown, Loader2, Mail, Send, Sparkles, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -78,9 +79,8 @@ export default function CounselPrep({ center, lawyer, dist, chosen, openReport, 
       </div>
 
       {/* 센터 상담 정보: 상담 준비 바로 아래에서 확인 (전화번호·상담 시간 등) */}
-      <details className="rounded-lg border bg-background/70 p-3 text-sm">
-        <summary className="cursor-pointer font-semibold">이 센터의 상담 정보 · 노무사 정보</summary>
-        <div className="mt-2 grid gap-3">
+      <Fold title="이 센터의 상담 정보" sub="상담 전화 · 상담 시간 · 노무사 정보" bodyClassName="text-sm">
+        <div className="grid gap-3">
           <dl className="grid gap-1.5 sm:grid-cols-[8rem_1fr]">
             <dt className="text-muted-foreground">상주 노무사</dt>
             <dd><Badge variant={cn.resident ? 'default' : 'outline'}>{cn.resident ? '공인노무사 상주' : '확인 필요'}</Badge> <span className="text-muted-foreground">서울노동포털 안내 기준{cn.names ? ` · ${cn.names[0]} 노무사(임시 데이터, 가상 인물)` : ' · 개인 이름은 공개되지 않아요'}</span></dd>
@@ -104,7 +104,7 @@ export default function CounselPrep({ center, lawyer, dist, chosen, openReport, 
           )}
           <p className="text-muted-foreground">출처: <a className="underline" href={CENTERS_SOURCE.url} target="_blank" rel="noreferrer">{CENTERS_SOURCE.label}</a> · <a className="underline" href={SEOUL_COUNSEL.source.url} target="_blank" rel="noreferrer">{SEOUL_COUNSEL.source.label}</a> ({SEOUL_COUNSEL.source.checkedAt} 확인)</p>
         </div>
-      </details>
+      </Fold>
 
       {/* 상담 리포트: 방식에 따라 필요한 정도가 달라요 */}
       {m.report === 'optional' ? (

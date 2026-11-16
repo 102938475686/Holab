@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { ArrowRight, ChevronDown, CircleHelp, Sparkles, X, XCircle } from 'lucide-react'
+import { ArrowRight, CircleHelp, Sparkles, X, XCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Field } from '@/components/common'
+import { Field, Fold } from '@/components/common'
 import { judgeCalc, type JudgeReply } from '@/lib/api'
 import LegalIssues from '@/components/LegalIssues'
 import Term from '@/components/Term'
@@ -290,12 +290,8 @@ export default function StepCalc() {
               )
             })()}
 
-            <details className="group rounded-xl border transition-colors hover:border-primary/40">
-              <summary className="flex cursor-pointer list-none items-center gap-3 px-5 py-4 [&::-webkit-details-marker]:hidden">
-                <span className="flex-1"><span className="block text-lg font-bold">왜 이 금액인가요?</span><span className="block text-sm text-muted-foreground">계산 내역 · 관련 법 조항</span></span>
-                <ChevronDown className="size-6 shrink-0 text-primary transition-transform group-open:rotate-180" />
-              </summary>
-              <div className="grid gap-4 px-5 pb-5">
+            <Fold title="왜 이 금액인가요?" sub="계산 내역 · 관련 법 조항">
+              <div className="grid gap-4">
             {bad && (
               <div className="grid gap-2">
                 <h4 className="text-sm font-semibold text-muted-foreground">그중 아직 못 받은 것으로 보이는 금액</h4>
@@ -344,14 +340,10 @@ export default function StepCalc() {
               <LegalIssues issues={calcIssues(calc, masked || pasteText, analysis)} heading="관련 법 조항 · 입력하신 내용 기준" />
 
               </div>
-            </details>
+            </Fold>
 
-            <details className="group rounded-xl border transition-colors hover:border-primary/40">
-              <summary className="flex cursor-pointer list-none items-center gap-3 px-5 py-4 [&::-webkit-details-marker]:hidden">
-                <span className="flex-1"><span className="block text-lg font-bold">실제로 받은 돈과 비교해 보기</span><span className="block text-sm text-muted-foreground">선택 · 통장에 들어온 금액과 나란히 비교</span></span>
-                <ChevronDown className="size-6 shrink-0 text-primary transition-transform group-open:rotate-180" />
-              </summary>
-              <div className="px-5 pb-5">
+            <Fold title="실제로 받은 돈과 비교해 보기" sub="선택 · 통장에 들어온 금액과 나란히 비교">
+              <div>
             {(() => {
               const rec = +calcIn.received || 0
               const monthlyFill = Math.round(calc.hourly * calc.weekly * WPM)
@@ -395,7 +387,7 @@ export default function StepCalc() {
               )
             })()}
               </div>
-            </details>
+            </Fold>
           </div>
         )}
       </CardContent>
