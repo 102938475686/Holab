@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ArrowDown, ArrowRight, FlaskConical, ListChecks, MessageCircle } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BookOpen, Calculator, ChevronRight, FileText, FlaskConical, Info, ListChecks, MapPin, MessageCircle } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import Mascot from '@/components/Mascot'
@@ -15,12 +15,12 @@ function ComparisonSection() {
         <h2 className="text-3xl font-bold sm:text-4xl">정보를 주는 걸 넘어,<br />행동까지 합니다</h2>
         <div className="mt-12 grid gap-8 sm:grid-cols-2">
           <div className="grid gap-3">
-            <span className="text-[13px] font-semibold tracking-wide text-muted-foreground">기존 AI (ChatGPT 등)</span>
+            <span className="text-sm font-semibold tracking-wide text-muted-foreground">기존 AI (ChatGPT 등)</span>
             <p className="text-lg leading-relaxed text-muted-foreground">"주휴수당 계산법은 이렇습니다."</p>
             <p className="text-sm text-muted-foreground">정보 제공에서 끝나고, 청년은 다시 혼자 계산기를 두드립니다.</p>
           </div>
           <div className="grid gap-3 border-l-2 border-primary/50 pl-8">
-            <span className="text-[13px] font-semibold tracking-wide text-primary">HoLab 에이전트</span>
+            <span className="text-sm font-semibold tracking-wide text-primary">HoLab 에이전트</span>
             <p className="text-lg leading-relaxed">"미지급액 538,085원 확인했어요. 노동청 진정서 작성을 도와드릴게요. 무료 노무사 연결도 가능해요."</p>
             <p className="text-sm text-muted-foreground">계산 → 분석 → 작성 → 연결까지, 실제 행동으로 이어집니다.</p>
           </div>
@@ -39,20 +39,20 @@ function ExplainabilitySection() {
         <p className="mt-4 max-w-xl text-muted-foreground">결론부터 말하고 근거를 그 아래에 답니다. 법이 요구하는 항목이 빠져 있으면 바로 표시돼요. 전부 다시 읽지 않아도 돼요.</p>
         <div className="mt-12 grid gap-6 lg:grid-cols-2">
           <div data-ui className="lift rounded-xl border bg-card p-6">
-            <span className="text-[13px] font-semibold text-muted-foreground">결론부터 · 근거는 그 아래에</span>
+            <span className="text-sm font-semibold text-muted-foreground">결론부터 · 근거는 그 아래에</span>
             <div className="mt-3 flex items-center gap-2"><Badge variant="destructive">위험</Badge><b>주휴수당 포함</b></div>
             <p className="mt-2 text-sm italic text-muted-foreground">"주휴수당은 시급에 포함하여 지급한 것으로 본다"</p>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">주휴수당은 별도로 지급해야 하며, 시급에 포함할 수 없습니다.</p>
-            <p className="mt-2 text-[13px] font-medium text-primary">근로기준법 제55조</p>
+            <p className="mt-2 text-sm font-medium text-primary">근로기준법 제55조</p>
           </div>
           <div data-ui className="lift rounded-xl border bg-card p-6">
-            <span className="text-[13px] font-semibold text-muted-foreground">법이 요구하는 항목이 빠지면 바로 표시</span>
+            <span className="text-sm font-semibold text-muted-foreground">법이 요구하는 항목이 빠지면 바로 표시</span>
             <p className="mt-3 text-sm text-muted-foreground">계약서에서 확인되지 않은 항목</p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               <Badge variant="secondary">휴게시간</Badge><Badge variant="secondary">연차휴가</Badge><Badge variant="secondary">사회보험 적용</Badge>
             </div>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">근로계약서에는 임금, 소정근로시간, 휴일, 연차휴가 등이 명시되어야 합니다.</p>
-            <p className="mt-2 text-[13px] font-medium text-primary">근로기준법 제17조</p>
+            <p className="mt-2 text-sm font-medium text-primary">근로기준법 제17조</p>
           </div>
         </div>
       </div>
@@ -126,7 +126,7 @@ function EvalSection() {
             <tbody>
               {rows.map((r) => (
                 <tr key={r.label} className="border-b last:border-0">
-                  <td className="p-3">{r.label}{r.hint && <span className="ml-2 text-[13px] text-muted-foreground">{r.hint}</span>}</td>
+                  <td className="p-3">{r.label}{r.hint && <span className="ml-2 text-sm text-muted-foreground">{r.hint}</span>}</td>
                   <td className={`p-3 text-right text-base ${r.ragBetter ? 'font-extrabold text-primary' : 'font-semibold'}`}>{r.a}</td>
                   <td className={`p-3 text-right text-base ${r.ragBetter === false ? 'font-extrabold text-primary' : 'text-muted-foreground'}`}>{r.b}</td>
                 </tr>
@@ -134,7 +134,7 @@ function EvalSection() {
             </tbody>
           </table>
         </div>
-        <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
           평가 방법: 임금·해고·괴롭힘·산재·외국인·연소근로 등 {rag.cases}개 사건, 같은 AI 모델({d.model}), 정답은 팀이 법제처 원문 기준으로 작성(전문가 검수 전). 사건 수가 적고 AI 답은 실행할 때마다 조금씩 달라질 수 있어 <b className="text-foreground">참고 수치</b>로 봐 주세요. 기능 밖 공식 절차 안내는 두 방식 모두 낮아서, 지금은 조문에 적힌 내용만 안내하고 나머지는 노무사·센터 확인을 권해요.
         </p>
       </div>
@@ -163,17 +163,17 @@ function ClosingSection() {
 }
 function HomeFooter() {
   return (
-    <footer className="border-t px-5 py-10 text-center text-[13px] text-muted-foreground"> {/* taste-skill-ignore: 본문과 푸터를 구분하는 실질적 경계선 */}
+    <footer className="border-t px-5 py-10 text-center text-sm text-muted-foreground"> {/* taste-skill-ignore: 본문과 푸터를 구분하는 실질적 경계선 */}
       <p>이 서비스는 참고용 정보이며 법률 자문이 아닙니다. 중요한 결정은 노무사·노동청과 상담하세요.</p>
       <p className="mt-2">HoLab · 1팀 김연우 · 김연호 · 노유승 · 차도현 · SDGs 8.8 노동권 보호</p>
     </footer>
   )
 }
 
-export default function Home() {
-  const { loadSample, setConsultOpen, setView } = useStore()
-
-  // 첫 화면 아래 요소는 스크롤해서 보일 때 등장 모션을 재생 (그 전에는 멈춰 둠)
+// 발표·소개용 페이지: 기존 AI와 비교, 근거 보여주기, 평가 결과, 개인정보 보호 (사용자 첫 화면에서는 뺐어요)
+export function AboutPage() {
+  const { setView } = useStore()
+  // 요소가 스크롤해서 보일 때 등장 모션을 재생 (그 전에는 멈춰 둠)
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const hero = document.querySelector('#home-hero')
@@ -191,6 +191,36 @@ export default function Home() {
     targets.forEach((el) => io.observe(el))
     return () => io.disconnect()
   }, [])
+
+  return (
+    <>
+      <header className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-3 px-5 py-4">
+        <button className="flex items-center gap-3 text-left" onClick={() => setView('home')} aria-label="처음 화면으로">
+          <span className="flex h-10 w-11 shrink-0 items-center justify-center"><img src={logo} alt="HoLab 로고" className="h-full w-full object-contain" /></span>
+          <span className="text-2xl font-extrabold tracking-tight">HoLab 소개</span>
+        </button>
+        <Button variant="outline" size="sm" onClick={() => setView('home')}><ArrowLeft /> 처음으로</Button>
+      </header>
+      <ComparisonSection />
+      <ExplainabilitySection />
+      <EvalSection />
+      <TrustSection />
+      <ClosingSection />
+      <HomeFooter />
+    </>
+  )
+}
+
+// HoLab이 도와주는 순서 (그림으로 한눈에, 누르면 그 기능으로 바로 이동)
+const FLOW = [
+  { n: 1, label: '못 받은 돈 계산', icon: Calculator },
+  { n: 2, label: '계약서 점검', icon: BookOpen },
+  { n: 3, label: '진정서 작성', icon: FileText },
+  { n: 4, label: '노무사 상담', icon: MapPin },
+]
+
+export default function Home() {
+  const { loadSample, setConsultOpen, setView, go } = useStore()
 
   return (
     <>
@@ -226,7 +256,7 @@ export default function Home() {
             className={`${riseIn(4).className} group flex min-h-[16rem] flex-col items-center justify-center gap-4 bg-primary px-8 py-10 text-center text-primary-foreground outline-none transition-[filter] hover:brightness-110 focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-white/70`}
           >
             <Mascot size={96} />
-            <span className="rounded-full bg-white/20 px-3 py-1 text-[13px] font-semibold">무슨 문제인지 모를 때</span>
+            <span className="rounded-full bg-white/20 px-3 py-1 text-sm font-semibold">무슨 문제인지 모를 때</span>
             <span className="text-3xl font-extrabold leading-snug sm:text-4xl">내 상황 이야기하기</span>
             <span className="max-w-sm text-base leading-relaxed">법률 용어를 몰라도 괜찮아요. 올랍이가 듣고 정리해서, 지금 쓰면 좋은 기능을 순서대로 알려 드려요.</span>
             <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white px-5 py-2.5 font-bold text-primary">올랍이와 이야기하기 <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" /></span>
@@ -236,34 +266,44 @@ export default function Home() {
             className={`${riseIn(5).className} group flex min-h-[16rem] flex-col items-center justify-center gap-4 bg-accent px-8 py-10 text-center text-foreground outline-none transition-colors hover:bg-primary/10 focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-primary/50`}
           >
             <span className="flex size-24 items-center justify-center rounded-3xl bg-primary/10 text-primary"><ListChecks className="size-12" /></span>
-            <span className="rounded-full bg-primary/10 px-3 py-1 text-[13px] font-semibold text-primary">필요한 기능을 알고 있을 때</span>
+            <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">필요한 기능을 알고 있을 때</span>
             <span className="text-3xl font-extrabold leading-snug sm:text-4xl">이미 필요한 도움을 알고 있어요</span>
             <span className="max-w-sm text-base leading-relaxed text-muted-foreground">못 받은 돈 확인, 계약서 분석, 진정서 작성, 노무사 매칭 중 필요한 기능으로 바로 들어가요.</span>
             <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 font-bold text-primary-foreground">기능 보러 가기 <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" /></span>
           </button>
         </div>
 
-        <div {...riseIn(6)} className={`${riseIn(6).className} flex flex-wrap items-center justify-center gap-x-6 gap-y-1 px-5 py-3 text-sm text-muted-foreground`}>
+        <nav {...riseIn(6)} aria-label="HoLab이 도와주는 순서" className={`${riseIn(6).className} px-5 pt-6`}>
+          <p className="mb-3 text-center text-sm font-semibold text-muted-foreground">HoLab이 도와주는 순서 · 필요한 것부터 눌러도 돼요</p>
+          <ol className="mx-auto grid max-w-4xl grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center">
+            {FLOW.map((f, i) => (
+              <li key={f.n} className="flex items-center gap-2">
+                <button type="button" onClick={() => go(f.n)} className="flex w-full items-center gap-2.5 rounded-2xl border bg-background px-4 py-3 text-left font-semibold transition-colors hover:border-primary hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-primary sm:w-auto">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"><f.icon className="size-5" /></span>
+                  <span><span className="block text-sm font-medium text-muted-foreground">{i + 1}단계</span>{f.label}</span>
+                </button>
+                {i < FLOW.length - 1 && <ChevronRight className="hidden size-5 shrink-0 text-muted-foreground sm:block" aria-hidden="true" />}
+              </li>
+            ))}
+          </ol>
+        </nav>
+
+        <div {...riseIn(6)} className={`${riseIn(6).className} flex flex-wrap items-center justify-center gap-x-6 gap-y-1 px-5 py-4 text-sm text-muted-foreground`}>
           <span className="inline-flex flex-wrap items-center gap-x-1">
             <FlaskConical className="size-4" /> 시연용 샘플
             {(['minsu', 'jiwoo'] as const).map((id) => (
-              <Button key={id} variant="link" size="sm" className="text-muted-foreground" onClick={() => loadSample(id)}>{SAMPLES[id].label} <span className="text-[13px] opacity-80">({SAMPLES[id].profile})</span></Button>
+              <Button key={id} variant="link" size="sm" className="text-muted-foreground" onClick={() => loadSample(id)}>{SAMPLES[id].label} <span className="text-sm opacity-80">({SAMPLES[id].profile})</span></Button>
             ))}
           </span>
           <button
             type="button"
-            onClick={() => document.getElementById('home-hero')?.nextElementSibling?.scrollIntoView({ behavior: 'smooth' })}
-            className="inline-flex items-center gap-1 text-[13px] hover:text-foreground"
+            onClick={() => { setView('about'); window.scrollTo({ top: 0 }) }}
+            className="inline-flex items-center gap-1 hover:text-foreground"
           >
-            아래로 내려보세요 <ArrowDown className="size-4 motion-safe:animate-bounce" />
+            <Info className="size-4" /> HoLab 소개 · 다른 AI와 무엇이 다른가요?
           </button>
         </div>
       </section>
-      <ComparisonSection />
-      <ExplainabilitySection />
-      <EvalSection />
-      <TrustSection />
-      <ClosingSection />
       <HomeFooter />
     </>
   )

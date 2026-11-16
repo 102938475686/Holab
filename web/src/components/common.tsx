@@ -12,7 +12,7 @@ export function Field({ label, children, className, auto }: { label: string; chi
     <div className={cn('grid gap-1.5', auto && 'auto-field', className)}>
       <Label className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
         {label}
-        {auto && <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[13px] font-semibold text-primary"><Sparkles className="size-3" />자동 작성 · {auto}</span>}
+        {auto && <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-sm font-semibold text-primary"><Sparkles className="size-3" />자동 작성 · {auto}</span>}
       </Label>
       {children}
     </div>

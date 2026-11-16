@@ -10,7 +10,7 @@ interface Action { label: string; onClick: () => void; disabled?: boolean; icon?
 export function StepFooter({ hint, primary, secondary }: { hint?: string; primary?: Action; secondary?: Action[] }) {
   return (
     <CardFooter className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
-      {hint && <p className="text-[13px] text-muted-foreground sm:max-w-sm">{hint}</p>}
+      {hint && <p className="text-sm text-muted-foreground sm:max-w-sm">{hint}</p>}
       <div className="flex flex-wrap gap-2 sm:ml-auto">
         {secondary?.map((s) => (
           <Button key={s.label} variant="outline" size="sm" onClick={s.onClick} disabled={s.disabled}>{s.icon}{s.label}</Button>

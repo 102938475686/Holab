@@ -84,7 +84,7 @@ export default function PayslipCheck({ calc }: { calc: CalcResult }) {
   return (
     <div className="grid gap-3 rounded-xl border p-4">
       <h3 className="flex items-center gap-2 font-semibold"><CreditCard className="size-4 text-muted-foreground" /> 급여명세서로 실제 받은 금액 확인 <Badge variant="outline">선택</Badge></h3>
-      <p className="flex items-start gap-1.5 text-[13px] text-muted-foreground">
+      <p className="flex items-start gap-1.5 text-sm text-muted-foreground">
         <Lock className="mt-0.5 size-3.5 shrink-0" />
         <span>사진은 <b>내 브라우저 안에서</b>만 글자로 변환됩니다. 서버나 AI로 전송되지 않습니다.</span>
       </p>
@@ -104,7 +104,7 @@ export default function PayslipCheck({ calc }: { calc: CalcResult }) {
           {pct !== null && (
             <div className="grid gap-1.5">
               <Progress value={pct} />
-              <p className="text-[13px] text-muted-foreground">{pctText}</p>
+              <p className="text-sm text-muted-foreground">{pctText}</p>
             </div>
           )}
           {notFound && pct === null && (
@@ -114,10 +114,10 @@ export default function PayslipCheck({ calc }: { calc: CalcResult }) {
               <AlertDescription>사진이 흐리거나 양식이 달라서일 수 있어요. 아래 금액 칸에 직접 입력해 주세요.</AlertDescription>
             </Alert>
           )}
-          {matched && <p className="text-[13px] text-muted-foreground">인식된 부분: “{matched}”</p>}
+          {matched && <p className="text-sm text-muted-foreground">인식된 부분: “{matched}”</p>}
         </TabsContent>
         <TabsContent value="manual" className="pt-3">
-          <p className="text-[13px] text-muted-foreground">급여명세서에 적힌 금액을 아래 칸에 직접 입력하세요.</p>
+          <p className="text-sm text-muted-foreground">급여명세서에 적힌 금액을 아래 칸에 직접 입력하세요.</p>
         </TabsContent>
       </Tabs>
 
@@ -140,7 +140,7 @@ export default function PayslipCheck({ calc }: { calc: CalcResult }) {
 
       {valid && (
         <div className="grid gap-2">
-          <p className="text-[13px] font-semibold text-muted-foreground">A. 법정 최소 기준과 비교</p>
+          <p className="text-sm font-semibold text-muted-foreground">A. 법정 최소 기준과 비교</p>
           {kind === 'gross' ? (
             diff > 1000 ? (
               <Alert variant="destructive">
@@ -168,7 +168,7 @@ export default function PayslipCheck({ calc }: { calc: CalcResult }) {
       )}
 
       <div className="grid gap-2 rounded-lg border bg-muted/30 p-3">
-        <p className="text-[13px] font-semibold text-muted-foreground">B. 근로계약서에 적힌 약정 급여와 비교 (주휴수당 등을 포함해서 월급으로 써 놓은 경우에 유용해요)</p>
+        <p className="text-sm font-semibold text-muted-foreground">B. 근로계약서에 적힌 약정 급여와 비교 (주휴수당 등을 포함해서 월급으로 써 놓은 경우에 유용해요)</p>
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="grid gap-1.5">
             <Label htmlFor="cAmt">계약서에 적힌 급여 (원)</Label>
@@ -204,7 +204,7 @@ export default function PayslipCheck({ calc }: { calc: CalcResult }) {
 
       {valid && kind === 'gross' && (
         <dl className="grid gap-1.5 rounded-lg border p-3 text-sm">
-          <p className="text-[13px] font-semibold text-muted-foreground">한눈에 비교 (월, 세전)</p>
+          <p className="text-sm font-semibold text-muted-foreground">한눈에 비교 (월, 세전)</p>
           <div className="flex justify-between"><dt>계약 시급</dt><dd>{calc.hourly.toLocaleString()}원</dd></div>
           {hasContract && <div className="flex justify-between"><dt>계약서에 적힌 급여</dt><dd>{won(cAmt)}</dd></div>}
           <div className="flex justify-between"><dt>법적 기준 계산액</dt><dd>{won(dueGross)}</dd></div>

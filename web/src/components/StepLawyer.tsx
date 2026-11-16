@@ -316,37 +316,37 @@ export default function StepLawyer() {
     <Card>
       <CardHeader>
         <CardTitle className="text-xl">노무사 매칭 · 상담 준비</CardTitle>
-        <CardDescription>내 사건 분야에 맞는 노무사를 찾고, <b>상담 방식</b>에 맞춰 준비물을 챙긴 뒤 메일로 보내요. <Badge variant="outline" className="ml-1">센터는 실제 기관 · 노무사는 임시 데이터</Badge></CardDescription>
+        <CardDescription>내 사건에 맞는 노무사를 찾고, 상담 준비물을 챙겨 메일로 보내요. <Badge variant="outline" className="ml-1">센터는 실제 기관 · 노무사는 임시 데이터</Badge><span className="mt-1 block">🔒 위치와 예약 기록은 이 기기에만 저장돼요.</span></CardDescription>
       </CardHeader>
       <CardContent className="grid gap-6">
         {/* 1. 내 위치 */}
         <section className="grid gap-3" aria-labelledby="s4-1">
-          <h3 id="s4-1" className="flex items-center gap-2 font-semibold"><span className="flex size-6 items-center justify-center rounded-full bg-primary text-[13px] font-bold text-primary-foreground">1</span> 내 위치 정하기</h3>
+          <h3 id="s4-1" className="flex items-center gap-2 font-semibold"><span className="flex size-6 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">1</span> 내 위치 정하기</h3>
           <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/40 p-3">
             <Button size="sm" variant={sortByDistance ? 'default' : 'outline'} onClick={myLoc ? () => setSortByDistance((v) => !v) : findNearby} disabled={locBusy}>
               {locBusy ? <Loader2 className="animate-spin" /> : <MapPin />} {myLoc ? (sortByDistance ? '거리순 보는 중' : '거리순으로 보기') : '내 위치에서 가까운 센터 찾기'}
             </Button>
             {myLoc && sortByDistance && <Button size="sm" variant="ghost" onClick={() => setSortByDistance(false)}>기본 순서로 보기</Button>}
-            <label className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
+            <label className="flex items-center gap-1.5 text-sm text-muted-foreground">
               또는 직접 선택
               <select aria-label="사는 지역 직접 선택" defaultValue="" onChange={(e) => e.target.value && pickDistrict(e.target.value)}
-                className="h-8 rounded-md border bg-background px-2 text-[13px] text-foreground">
+                className="h-8 rounded-md border bg-background px-2 text-sm text-foreground">
                 <option value="" disabled>자치구</option>
                 {districts.map((d) => <option key={d} value={d}>{d}</option>)}
               </select>
             </label>
-            <p className="w-full text-[13px] text-muted-foreground">위치 정보는 거리 계산에만 쓰이고 기기 밖으로 전송되지 않아요. 서울 지역 센터를 제공하며, 다른 지역은 고용노동부 1350(무료 상담)으로 문의할 수 있어요.</p>
+            <p className="w-full text-sm text-muted-foreground">위치 정보는 거리 계산에만 쓰이고 기기 밖으로 전송되지 않아요. 서울 지역 센터를 제공하며, 다른 지역은 고용노동부 1350(무료 상담)으로 문의할 수 있어요.</p>
           </div>
           {locErr && <Alert variant="destructive"><TriangleAlert /><AlertDescription>{locErr} 위의 “직접 선택”으로 사는 구를 골라도 돼요.</AlertDescription></Alert>}
         </section>
 
         {/* 2. 센터 고르기 */}
         <section className="grid gap-3" aria-labelledby="s4-2">
-          <h3 id="s4-2" className="flex items-center gap-2 font-semibold"><span className="flex size-6 items-center justify-center rounded-full bg-primary text-[13px] font-bold text-primary-foreground">2</span> 노무사 매칭 <span className="text-[13px] font-normal text-muted-foreground">· 지도의 번호는 아래 목록 순서예요</span></h3>
+          <h3 id="s4-2" className="flex items-center gap-2 font-semibold"><span className="flex size-6 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">2</span> 노무사 매칭 <span className="text-sm font-normal text-muted-foreground">· 지도의 번호는 아래 목록 순서예요</span></h3>
           <div className="grid gap-3 rounded-xl border-2 border-primary/40 bg-primary/5 p-4">
             <div className="flex flex-wrap items-center gap-3">
               <Button onClick={autoPick} disabled={autoBusy}>{autoBusy ? <Loader2 className="animate-spin" /> : <Sparkles />} 노무사 자동 매칭</Button>
-              <span className="text-[13px] text-muted-foreground">내 사건 분야{need.length ? `(${need.join('·')})` : ''}와 {myLoc ? '고른 위치' : '내 위치(허용 시)'}로 적합한 노무사를 골라 이유와 함께 보여 드려요.</span>
+              <span className="text-sm text-muted-foreground">내 사건 분야{need.length ? `(${need.join('·')})` : ''}와 {myLoc ? '고른 위치' : '내 위치(허용 시)'}로 적합한 노무사를 골라 이유와 함께 보여 드려요.</span>
             </div>
             {autoRes && (
               <div className="pop-in grid gap-2 rounded-lg bg-background p-3.5 text-sm" aria-live="polite">
@@ -354,19 +354,19 @@ export default function StepLawyer() {
                 <ul className="grid gap-1">
                   {autoRes.reasons.map((r) => <li key={r} className="flex items-start gap-1.5"><Check className="mt-0.5 size-4 shrink-0 text-emerald-700" strokeWidth={3} /> {r}</li>)}
                 </ul>
-                {autoRes.notes.map((n) => <p key={n} className="text-[13px] text-muted-foreground">ⓘ {n}</p>)}
-                {autoRes.alts.length > 0 && <p className="text-[13px] text-muted-foreground">다른 후보: {autoRes.alts.map((a) => `${a.name} (${a.line})`).join(' · ')}</p>}
+                {autoRes.notes.map((n) => <p key={n} className="text-sm text-muted-foreground">ⓘ {n}</p>)}
+                {autoRes.alts.length > 0 && <p className="text-sm text-muted-foreground">다른 후보: {autoRes.alts.map((a) => `${a.name} (${a.line})`).join(' · ')}</p>}
                 <div className="flex flex-wrap gap-2 pt-1">
                   <Button size="sm" onClick={() => document.getElementById('prep')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>이 노무사로 상담 준비하기 <ArrowRight /></Button>
                   <Button size="sm" variant="ghost" onClick={() => document.getElementById('lawyer-pick')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>이 센터의 다른 노무사 보기</Button>
                 </div>
               </div>
             )}
-            {locErr && <p className="text-[13px] text-destructive">{locErr} 위의 “직접 선택”으로 사는 구를 고른 뒤 다시 눌러 주세요.</p>}
+            {locErr && <p className="text-sm text-destructive">{locErr} 위의 “직접 선택”으로 사는 구를 고른 뒤 다시 눌러 주세요.</p>}
           </div>          <CenterMap centers={mapCenters} selected={sel} onSelect={(n) => pick(n)} me={myLoc} />
-          <p className="text-[13px] text-muted-foreground"><MapPin className="mr-1 inline size-3.5" />핀이나 목록에서 센터를 고르세요. 지도 타일은 OpenStreetMap에서 불러오며, 내 위치는 이 기기 밖으로 보내지 않아요.</p>
+          <p className="text-sm text-muted-foreground"><MapPin className="mr-1 inline size-3.5" />핀이나 목록에서 센터를 고르세요. 지도 타일은 OpenStreetMap에서 불러오며, 내 위치는 이 기기 밖으로 보내지 않아요.</p>
           {/* 추천 순서 이유를 한 문장으로 먼저 보여 주고, 계산 방법은 "자세히 보기"로 */}
-          <details className="rounded-lg border p-3 text-[13px]">
+          <details className="rounded-lg border p-3 text-sm">
             <summary className="cursor-pointer list-none">
               <span className="font-semibold text-foreground">추천 순서 이유</span>{' '}
               <span className="text-muted-foreground">
@@ -403,8 +403,8 @@ export default function StepLawyer() {
                       {lead && <Badge>{lead}</Badge>}
                       {l.dist != null && l.dist >= 0.05 && <Badge variant="outline" className="gap-1"><MapPin className="size-3" /> {fmtKm(l.dist)}</Badge>}
                     </div>
-                    <p className="text-[13px] text-muted-foreground">{l.office} · {l.region} · {l.address}</p>
-                    <p className="text-[13px]"><a href={`tel:${l.phone.replace(/[^0-9]/g, '').slice(0, 11)}`} className="font-medium underline-offset-2 hover:underline">{l.phone}</a> <span className="text-muted-foreground">· {l.why.join(' · ')}</span></p>
+                    <p className="text-sm text-muted-foreground">{l.office} · {l.region} · {l.address}</p>
+                    <p className="text-sm"><a href={`tel:${l.phone.replace(/[^0-9]/g, '').slice(0, 11)}`} className="font-medium underline-offset-2 hover:underline">{l.phone}</a> <span className="text-muted-foreground">· {l.why.join(' · ')}</span></p>
                   </div>
                   <div className="flex shrink-0 items-center gap-1.5">
                     <a href={mapLink(l)} target="_blank" rel="noreferrer" className="inline-flex h-7 items-center gap-1 rounded-lg px-2 text-[0.8rem] font-medium hover:bg-muted"><Navigation className="size-3.5" /> 길찾기</a>
@@ -423,7 +423,7 @@ export default function StepLawyer() {
 
         {/* 3. 고른 센터 안 노무사: 적합도 순 (임시 데이터) */}
         <section id="lawyer-pick" className="grid gap-3 scroll-mt-16" aria-label="센터 안 노무사 고르기">
-          <h3 className="flex flex-wrap items-center gap-2 font-semibold"><span className="flex size-6 items-center justify-center rounded-full bg-primary text-[13px] font-bold text-primary-foreground">3</span> {reportCenter.name}의 노무사 <Badge variant="outline">임시 데이터</Badge></h3>
+          <h3 className="flex flex-wrap items-center gap-2 font-semibold"><span className="flex size-6 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">3</span> {reportCenter.name}의 노무사 <Badge variant="outline">임시 데이터</Badge></h3>
           <div className="grid gap-2 sm:grid-cols-2">
             {lwRank.map((r, i) => {
               const on = chosenLw?.name === r.lw.name
@@ -435,9 +435,9 @@ export default function StepLawyer() {
                     {i === 0 && r.pct != null && <Badge>가장 잘 맞아요</Badge>}
                   </div>
                   <div className="flex flex-wrap items-center gap-1">
-                    {r.lw.specialties.map((s) => <span key={s} className={`rounded-full px-2 py-0.5 text-[12px] font-medium ${r.fit.includes(s) ? 'bg-emerald-700 text-white' : 'bg-muted text-muted-foreground'}`}>{s}</span>)}
+                    {r.lw.specialties.map((s) => <span key={s} className={`rounded-full px-2 py-0.5 text-sm font-medium ${r.fit.includes(s) ? 'bg-emerald-700 text-white' : 'bg-muted text-muted-foreground'}`}>{s}</span>)}
                   </div>
-                  <p className="text-[13px] text-muted-foreground">{r.lw.intro} · 상담 {r.lw.hours}</p>
+                  <p className="text-sm text-muted-foreground">{r.lw.intro} · 상담 {r.lw.hours}</p>
                   <Button size="sm" variant={on ? 'secondary' : 'default'} className="justify-self-start" onClick={() => { setSelLw(r.lw.name); setTimeout(() => document.getElementById('prep')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150) }}>
                     {on ? <><Check /> 선택됨</> : '이 노무사 선택'}
                   </Button>
@@ -445,7 +445,7 @@ export default function StepLawyer() {
               )
             })}
           </div>
-          <p className="text-[13px] text-muted-foreground">초록색 분야는 내 사건과 맞는 분야예요. 노무사 이름·분야·이메일은 시연용 가상 정보이고, 실제 서비스에서는 센터에서 확인한 정보로 채워져요.</p>
+          <p className="text-sm text-muted-foreground">초록색 분야는 내 사건과 맞는 분야예요. 노무사 이름·분야·이메일은 시연용 가상 정보이고, 실제 서비스에서는 센터에서 확인한 정보로 채워져요.</p>
         </section>
 
         {/* 4. 상담 준비 */}
@@ -456,7 +456,7 @@ export default function StepLawyer() {
             mail={{ realMail, to: toAddr, setTo: setToAddr, valid: validMail(toAddr), onSend: open, sentFor: mailedCenter }}
           />
         )}
-        <p className="text-[13px] text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           ※ 센터 연락처는 <a href={CENTERS_SOURCE.url} target="_blank" rel="noreferrer" className="underline">{CENTERS_SOURCE.label}</a>에 공개된 실제 정보입니다 ({CENTERS_SOURCE.checkedAt} 확인). <b>노무사 이름·전담 분야·이메일은 시연용 임시 데이터(가상 인물)</b>이며, 적합도는 HoLab 참고용이에요. HoLab은 센터에 대신 접수하지 않아요. 접수 방법은 센터마다 다르니 전화로 먼저 확인하세요.
         </p>
       </CardContent>
@@ -470,19 +470,19 @@ export default function StepLawyer() {
                 <DialogDescription>{target.name} · {target.region}</DialogDescription>
               </DialogHeader>
               <div className="grid gap-2">
-                <label className="grid gap-1 text-sm font-semibold">받는 이메일 <span className="text-[13px] font-normal text-muted-foreground">(노무사 이메일이 채워져 있어요. 고칠 수 있어요)</span>
+                <label className="grid gap-1 text-sm font-semibold">받는 이메일 <span className="text-sm font-normal text-muted-foreground">(노무사 이메일이 채워져 있어요. 고칠 수 있어요)</span>
                   <Input type="email" value={toAddr} onChange={(e) => setToAddr(e.target.value)} aria-label="받는 이메일" placeholder="name@example.com" aria-invalid={!!toAddr && !validMail(toAddr)} />
                 </label>
-                {toAddr && !validMail(toAddr) && <p className="text-[13px] text-destructive">이메일 형식이 올바르지 않아요.</p>}
+                {toAddr && !validMail(toAddr) && <p className="text-sm text-destructive">이메일 형식이 올바르지 않아요.</p>}
                 <p className="flex flex-wrap items-center gap-2 text-sm font-semibold">메일 내용 확인 · 수정 <Badge variant="secondary"><Sparkles /> 자동 작성 · 상담·못 받은 돈·계약서·진정서 내용</Badge></p>
-                <p className="text-[13px] text-muted-foreground">AI 상담·계산·계약서 분석 내용을 정리한 메일 초안이에요. 자유롭게 고친 뒤 아래 <b>전송 확인</b>을 눌러야 전송됩니다.</p>
+                <p className="text-sm text-muted-foreground">AI 상담·계산·계약서 분석 내용을 정리한 메일 초안이에요. 자유롭게 고친 뒤 아래 <b>전송 확인</b>을 눌러야 전송됩니다.</p>
                 <Input value={subject} onChange={(e) => setSubject(e.target.value)} aria-label="메일 제목" placeholder="메일 제목" disabled={composing} />
                 {composing ? (
                   <div className="flex h-56 items-center justify-center gap-2 rounded-lg border text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin" /> 상담 내용을 정리하는 중…</div>
                 ) : (
                   <Textarea value={mailBody} onChange={(e) => setMailBody(e.target.value)} aria-label="메일 본문" className="h-64 resize-y text-sm leading-relaxed" />
                 )}
-                <p className="flex items-center gap-1.5 text-[13px] text-muted-foreground"><Mail className="size-3.5" /> {form.draft.trim().length >= 20 ? <>첨부: <b className="text-foreground">진정서_{form.pName.trim() || '초안'}.pdf</b> (진정서 양식, <b>주민등록번호 포함</b>) — 전송 시 자동 첨부</> : '진정서를 아직 작성하지 않아 메일 본문만 전송돼요 (첨부 없음)'}</p>
+                <p className="flex items-center gap-1.5 text-sm text-muted-foreground"><Mail className="size-3.5" /> {form.draft.trim().length >= 20 ? <>첨부: <b className="text-foreground">진정서_{form.pName.trim() || '초안'}.pdf</b> (진정서 양식, <b>주민등록번호 포함</b>) — 전송 시 자동 첨부</> : '진정서를 아직 작성하지 않아 메일 본문만 전송돼요 (첨부 없음)'}</p>
               </div>
               {realMail ? (
                 <Alert>
@@ -492,7 +492,7 @@ export default function StepLawyer() {
                   </AlertDescription>
                 </Alert>
               ) : (
-                <p className="text-[13px] text-muted-foreground"><Badge variant="outline" className="mr-1">시연용</Badge>메일 발송 설정이 꺼져 있어 실제 전송은 이루어지지 않는 가상 전송입니다.</p>
+                <p className="text-sm text-muted-foreground"><Badge variant="outline" className="mr-1">시연용</Badge>메일 발송 설정이 꺼져 있어 실제 전송은 이루어지지 않는 가상 전송입니다.</p>
               )}
               {error && (
                 <Alert variant="destructive">
@@ -539,7 +539,7 @@ export default function StepLawyer() {
                 접수번호 <b>{receipt}</b><br />
                 {sentTo ? <>메일함(스팸함 포함)을 확인해 주세요. 몇 분 걸릴 수 있어요.</> : <>실제 메일은 발송되지 않았어요.</>}
               </div>
-              <p className="text-[13px] text-muted-foreground">HoLab은 센터에 대신 접수하지 않아요. 답장이 없으면 전화로 한 번 더 확인하세요.</p>
+              <p className="text-sm text-muted-foreground">HoLab은 센터에 대신 접수하지 않아요. 답장이 없으면 전화로 한 번 더 확인하세요.</p>
               <DialogFooter><Button onClick={() => setTarget(null)}>확인</Button></DialogFooter>
             </>
           )}
@@ -564,7 +564,7 @@ export default function StepLawyer() {
               리포트 PDF가 저장되었습니다. 상담 시간이 짧아도 상황·쟁점·질문을 바로 꺼내 보여줄 수 있어요.
             </div>
           )}
-          <p className="text-[13px] text-muted-foreground"><Badge variant="outline" className="mr-1">참고용</Badge>법률 자문이 아니며, 상담 시 노무사와 사실 관계를 다시 확인하세요.</p>
+          <p className="text-sm text-muted-foreground"><Badge variant="outline" className="mr-1">참고용</Badge>법률 자문이 아니며, 상담 시 노무사와 사실 관계를 다시 확인하세요.</p>
           <DialogFooter>
             {reportErr && !report && <Button variant="outline" onClick={() => reportFor && openReport(reportFor)}>다시 시도</Button>}
             <Button variant="outline" onClick={() => setReportFor(null)} disabled={reportBusy || reportPdfBusy}>{reportSaved ? '닫기' : '다운로드 안 하고 닫기'}</Button>

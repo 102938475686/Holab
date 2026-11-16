@@ -5,7 +5,7 @@ import type { LegalIssue } from '@/lib/legal'
 import { clearReservations } from '@/lib/counsel'
 import { SAMPLES, type SampleId } from '@/lib/sample'
 
-export type View = 'home' | 'help' | 'consult' | 'wizard'
+export type View = 'home' | 'help' | 'about' | 'consult' | 'wizard'
 export interface NextRec { from: string; step: number; label: string; reason: string }
 
 export interface FormState {

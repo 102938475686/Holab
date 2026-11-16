@@ -129,6 +129,15 @@
 }
 html, body { background: #fff; }
 
+/* 읽기 편하게: 기본 글씨를 16px → 17px로 키우면 rem으로 정한 글씨·여백·카드 간격도 함께 6% 커져요.
+   (진정서·리포트 PDF는 px로 고정된 print.css를 써서 영향이 없어요) */
+html { font-size: 106.25%; }
+body { line-height: 1.65; }
+/* 터치 화면(휴대폰·패드)에서는 버튼을 손가락으로 누르기 쉬운 높이(약 47px)로 */
+@media (pointer: coarse) {
+  [data-slot="button"] { min-height: 2.75rem; }
+}
+
 /* 카드: 그림자 대신 테두리로만 구분합니다. */
 [data-slot="card"] { box-shadow: none; }
 

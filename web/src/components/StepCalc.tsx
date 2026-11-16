@@ -108,7 +108,7 @@ function NoAmountHelp({ onHourly }: { onHourly: (v: number) => void }) {
     <div className="rounded-xl border border-dashed p-3 text-sm">
       <button type="button" aria-expanded={open} onClick={() => setOpen((v) => !v)} className="flex w-full items-center gap-2 text-left font-semibold">
         <CircleHelp className="size-4 shrink-0 text-primary" /> 계약서나 급여명세서가 없어서 금액을 모르겠어요
-        <span className="ml-auto text-[13px] font-normal text-primary">{open ? '닫기' : '방법 보기'}</span>
+        <span className="ml-auto text-sm font-normal text-primary">{open ? '닫기' : '방법 보기'}</span>
       </button>
       {open && (
         <div className="mt-3 grid gap-3">
@@ -119,14 +119,14 @@ function NoAmountHelp({ onHourly }: { onHourly: (v: number) => void }) {
             <li><b className="text-foreground">급여명세서는 요청할 수 있어요.</b> 사업주는 임금을 줄 때 임금명세서를 줘야 해요(근로기준법 제48조). 받은 적이 없다면 그것도 상담 내용이 돼요.</li>
           </ol>
           <div className="grid gap-2 rounded-lg bg-muted/50 p-3">
-            <b className="text-[13px]">통장 입금액으로 시급 어림하기</b>
+            <b className="text-sm">통장 입금액으로 시급 어림하기</b>
             <div className="flex flex-wrap items-end gap-2">
-              <label className="grid gap-1 text-[13px] text-muted-foreground">한 달에 들어온 돈 (원)<Input type="number" min={0} value={pay} onChange={(e) => setPay(e.target.value)} placeholder="예: 800000" className="h-9 w-40" /></label>
-              <label className="grid gap-1 text-[13px] text-muted-foreground">그 달에 일한 시간<Input type="number" min={0} value={hours} onChange={(e) => setHours(e.target.value)} placeholder="예: 86" className="h-9 w-32" /></label>
+              <label className="grid gap-1 text-sm text-muted-foreground">한 달에 들어온 돈 (원)<Input type="number" min={0} value={pay} onChange={(e) => setPay(e.target.value)} placeholder="예: 800000" className="h-9 w-40" /></label>
+              <label className="grid gap-1 text-sm text-muted-foreground">그 달에 일한 시간<Input type="number" min={0} value={hours} onChange={(e) => setHours(e.target.value)} placeholder="예: 86" className="h-9 w-32" /></label>
               <Button size="sm" variant="outline" disabled={!est} onClick={() => onHourly(est)}>{est ? `시급 약 ${est.toLocaleString()}원으로 채우기` : '두 칸을 입력하세요'}</Button>
               <Button size="sm" variant="ghost" onClick={() => onHourly(MIN_WAGE)}>최저임금으로 채우기</Button>
             </div>
-            <p className="text-[13px] text-muted-foreground">세금·4대보험이 빠진 금액이면 실제 시급보다 조금 낮게 나와요. 주휴수당이 섞여 있을 수도 있으니 결과는 어림값으로 봐 주세요.</p>
+            <p className="text-sm text-muted-foreground">세금·4대보험이 빠진 금액이면 실제 시급보다 조금 낮게 나와요. 주휴수당이 섞여 있을 수도 있으니 결과는 어림값으로 봐 주세요.</p>
           </div>
         </div>
       )}
@@ -159,15 +159,15 @@ export default function StepCalc() {
     <Card>
       <CardHeader>
         <CardTitle className="text-xl">못 받은 돈 확인</CardTitle>
-        <CardDescription>근무 조건을 넣으면 못 받은 돈을 계산해요. (2026년 최저임금 10,320원 기준 · 입력값은 이 브라우저에서만 계산돼요)</CardDescription>
+        <CardDescription>시급과 근무 시간을 넣으면 못 받은 돈을 계산해요. <span className="whitespace-nowrap">(2026년 최저임금 10,320원 기준)</span><span className="mt-1 block">🔒 입력한 숫자는 이 기기에서만 계산돼요.</span></CardDescription>
       </CardHeader>
       <CardContent className="grid gap-5">
         {calcAuto.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1.5 rounded-lg bg-primary/10 p-3 text-[13px]">
+          <div className="flex flex-wrap items-center gap-1.5 rounded-lg bg-primary/10 p-3 text-sm">
             <Badge>AI 상담에서 가져옴</Badge>
             <span>말씀하신 내용에서 채운 항목이에요. 맞는지 확인하고 틀리면 고치세요:</span>
             {calcAuto.map((l) => <Badge key={l} variant="secondary">{l}</Badge>)}
-            <Button variant="ghost" size="sm" className="ml-auto h-auto px-2 py-1 text-[13px]" onClick={() => setCalcAuto([])}>확인했어요</Button>
+            <Button variant="ghost" size="sm" className="ml-auto h-auto px-2 py-1 text-sm" onClick={() => setCalcAuto([])}>확인했어요</Button>
           </div>
         )}
         <NoAmountHelp onHourly={(v) => setCalcIn({ hourly: String(v) })} />
@@ -175,7 +175,7 @@ export default function StepCalc() {
           {NUM_FIELDS.map(([k, label, ph, hint]) => (
             <Field key={k} label={label}>
               <Input type="number" min={0} step="any" value={calcIn[k] as string} placeholder={ph} onChange={(e) => setCalcIn({ [k]: e.target.value })} />
-              {hint && <p className="text-[13px] text-muted-foreground">{hint}</p>}
+              {hint && <p className="text-sm text-muted-foreground">{hint}</p>}
             </Field>
           ))}
         </div>
@@ -194,13 +194,13 @@ export default function StepCalc() {
                   type="button"
                   aria-pressed={unknown.has(k)}
                   onClick={() => toggleUnknown(k)}
-                  className={`ml-auto shrink-0 rounded-full border px-2.5 py-0.5 text-[13px] ${unknown.has(k) ? 'border-primary bg-primary/15 text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`ml-auto shrink-0 rounded-full border px-2.5 py-0.5 text-sm ${unknown.has(k) ? 'border-primary bg-primary/15 text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                 >
                   잘 모르겠어요
                 </button>
               </div>
               {help && helpOpen === k && (
-                <div className="flex items-start gap-2 rounded-lg bg-muted/60 p-2.5 text-[13px] leading-relaxed text-muted-foreground">
+                <div className="flex items-start gap-2 rounded-lg bg-muted/60 p-2.5 text-sm leading-relaxed text-muted-foreground">
                   <span className="flex-1">{help}</span>
                   <button type="button" aria-label="설명 닫기" onClick={() => setHelpOpen(null)} className="shrink-0"><X className="size-3.5" /></button>
                 </div>
@@ -227,7 +227,7 @@ export default function StepCalc() {
                 <p className="text-3xl font-extrabold text-emerald-700">미지급 추정액 없음</p>
               )}
               <p className="mt-4 text-sm leading-relaxed">{summarySentence(calc)}</p>
-              {bad && <p className="mt-1 text-[13px] text-muted-foreground">임금채권 소멸시효는 3년이에요.</p>}
+              {bad && <p className="mt-1 text-sm text-muted-foreground">임금채권 소멸시효는 3년이에요.</p>}
             </div>
 
             {(() => {
@@ -242,7 +242,7 @@ export default function StepCalc() {
                 <div className="grid gap-3 rounded-xl border p-4">
                   <div>
                     <h4 className="flex flex-wrap items-center gap-2 text-sm font-semibold">실제로 받은 금액과 비교해 볼까요? <Badge variant="secondary">선택</Badge></h4>
-                    <p className="mt-0.5 text-[13px] text-muted-foreground">한 달 평균 세전 금액을 적으면 나란히 비교해요.</p>
+                    <p className="mt-0.5 text-sm text-muted-foreground">한 달 평균 세전 금액을 적으면 나란히 비교해요.</p>
                   </div>
                   <div className="flex flex-wrap items-end gap-2">
                     <div className="grid w-full max-w-xs gap-1.5">
@@ -268,7 +268,7 @@ export default function StepCalc() {
                         </TableBody>
                       </Table>
                       {showTotal && Math.abs(shortT - calc.total) > 1000 && (
-                        <p className="text-[13px] text-muted-foreground">위 부족액은 실제 입금 기준이고, 항목별 계산(주휴수당·최저임금 차액 등)은 {won(calc.total)}이에요. 차이가 크면 급여명세서의 항목별 금액을 확인해 보세요.</p>
+                        <p className="text-sm text-muted-foreground">위 부족액은 실제 입금 기준이고, 항목별 계산(주휴수당·최저임금 차액 등)은 {won(calc.total)}이에요. 차이가 크면 급여명세서의 항목별 금액을 확인해 보세요.</p>
                       )}
                     </>
                   )}

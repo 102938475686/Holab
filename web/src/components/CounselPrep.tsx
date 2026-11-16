@@ -72,13 +72,13 @@ export default function CounselPrep({ center, lawyer, dist, chosen, openReport, 
   return (
     <section id="prep" aria-labelledby="s4-3" className="scroll-mt-16 grid gap-4 overflow-hidden rounded-2xl border-2 border-primary bg-gradient-to-br from-primary/15 via-primary/5 to-background p-5 sm:p-6">
       <div>
-        <h3 id="s4-3" className="flex items-center gap-2 font-semibold"><span className="flex size-6 items-center justify-center rounded-full bg-primary text-[13px] font-bold text-primary-foreground">4</span> 상담 준비하기</h3>
+        <h3 id="s4-3" className="flex items-center gap-2 font-semibold"><span className="flex size-6 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">4</span> 상담 준비하기</h3>
         <p className="mt-2 text-sm text-muted-foreground">{chosen ? '선택한 노무사' : '아직 고르지 않아 1순위 노무사 기준이에요'}</p>
         <p className="text-lg font-extrabold">{lawyer ? `${lawyer.name} 노무사 · ` : ''}{center.name}{dist != null && dist >= 0.05 && <span className="ml-2 text-sm font-medium text-muted-foreground">{fmtKm(dist)}</span>}</p>
       </div>
 
       {/* 센터 상담 정보: 상담 준비 바로 아래에서 확인 (전화번호·상담 시간 등) */}
-      <details className="rounded-lg border bg-background/70 p-3 text-[13px]">
+      <details className="rounded-lg border bg-background/70 p-3 text-sm">
         <summary className="cursor-pointer font-semibold">이 센터의 상담 정보 · 노무사 정보</summary>
         <div className="mt-2 grid gap-3">
           <dl className="grid gap-1.5 sm:grid-cols-[8rem_1fr]">
@@ -111,8 +111,8 @@ export default function CounselPrep({ center, lawyer, dist, chosen, openReport, 
         <div className="flex flex-wrap items-center gap-3 rounded-xl border bg-background/80 p-4">
           <ClipboardList className="size-5 shrink-0 text-primary" />
           <div className="min-w-[200px] flex-1">
-            <div className="flex flex-wrap items-center gap-2 font-semibold">상담 준비 리포트 <span className={`rounded-full px-2 text-[13px] ${reportTone.cls}`}>{reportTone.badge}</span></div>
-            <p className="text-[13px] text-muted-foreground">{m.reportNote}</p>
+            <div className="flex flex-wrap items-center gap-2 font-semibold">상담 준비 리포트 <span className={`rounded-full px-2 text-sm ${reportTone.cls}`}>{reportTone.badge}</span></div>
+            <p className="text-sm text-muted-foreground">{m.reportNote}</p>
           </div>
           <Button variant="outline" onClick={() => openReport(center)} disabled={reportBusy}>{reportBusy ? <Loader2 className="animate-spin" /> : <FileDown />} 리포트 미리보기</Button>
         </div>
@@ -121,7 +121,7 @@ export default function CounselPrep({ center, lawyer, dist, chosen, openReport, 
           <div className="min-w-[260px] flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <Badge><ClipboardList /> 상담 준비 리포트</Badge>
-              <span className={`rounded-full px-2 py-0.5 text-[13px] font-semibold ${reportTone.cls}`}>{reportTone.badge}</span>
+              <span className={`rounded-full px-2 py-0.5 text-sm font-semibold ${reportTone.cls}`}>{reportTone.badge}</span>
               <Badge variant="secondary"><Sparkles /> 앞서 입력한 내용으로 자동 작성</Badge>
             </div>
             <h4 className="mt-2 text-xl font-extrabold leading-snug">상담 30분을 본론부터 시작하세요</h4>
@@ -131,8 +131,8 @@ export default function CounselPrep({ center, lawyer, dist, chosen, openReport, 
                 <li key={r.label} className="flex flex-wrap items-center gap-2">
                   <span className={`flex size-5 shrink-0 items-center justify-center rounded-full ${r.ok ? 'bg-emerald-700 text-white' : 'border border-dashed text-muted-foreground'}`}>{r.ok && <Check className="size-3.5" strokeWidth={3} />}</span>
                   <b>{r.label}</b>
-                  <span className="text-[13px] text-muted-foreground">{r.ok ? `· ${r.src}에서 자동 반영` : '· 아직 없어요'}</span>
-                  {!r.ok && r.go && <Button variant="link" size="sm" className="h-auto p-0 text-[13px]" onClick={() => go(r.go!)}>{r.src}으로 가기</Button>}
+                  <span className="text-sm text-muted-foreground">{r.ok ? `· ${r.src}에서 자동 반영` : '· 아직 없어요'}</span>
+                  {!r.ok && r.go && <Button variant="link" size="sm" className="h-auto p-0 text-sm" onClick={() => go(r.go!)}>{r.src}으로 가기</Button>}
                 </li>
               ))}
             </ul>
@@ -144,9 +144,9 @@ export default function CounselPrep({ center, lawyer, dist, chosen, openReport, 
                 <Button variant="outline" onClick={saveComplaintPdf} disabled={cmpBusy || form.draft.trim().length < 20}>{cmpBusy ? <Loader2 className="animate-spin" /> : <FileDown />} 진정서 PDF</Button>
               )}
             </div>
-            {(method === 'visit' || method === 'video') && form.draft.trim().length < 20 && <p className="mt-1.5 text-[13px] text-muted-foreground">진정서는 `진정서 작성`에서 내용을 작성하면 저장할 수 있어요. 아직 안 했다면 리포트만 있어도 돼요.</p>}
+            {(method === 'visit' || method === 'video') && form.draft.trim().length < 20 && <p className="mt-1.5 text-sm text-muted-foreground">진정서는 `진정서 작성`에서 내용을 작성하면 저장할 수 있어요. 아직 안 했다면 리포트만 있어도 돼요.</p>}
           </div>
-          <div aria-hidden="true" className="hidden w-48 shrink-0 rotate-2 rounded-lg border bg-white p-3 text-[13px] text-slate-700 shadow-xl sm:block">
+          <div aria-hidden="true" className="hidden w-48 shrink-0 rotate-2 rounded-lg border bg-white p-3 text-sm text-slate-700 shadow-xl sm:block">
             <div className="flex items-center justify-between border-b pb-1.5 font-bold text-slate-900"><span>상담 준비 리포트</span><span className="text-primary">HoLab</span></div>
             <div className="mt-2 grid gap-1.5">
               <div className="h-2 w-full rounded bg-slate-200" /><div className="h-2 w-5/6 rounded bg-slate-200" />
@@ -164,7 +164,7 @@ export default function CounselPrep({ center, lawyer, dist, chosen, openReport, 
       <div className="grid gap-4 rounded-xl border bg-background/80 p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h4 className="font-semibold">상담까지 진행하기</h4>
-          <span className="text-[13px] text-muted-foreground">진행 기록은 이 기기에만 저장돼요. 센터에 전달되지 않아요.</span>
+          <span className="text-sm text-muted-foreground">진행 기록은 이 기기에만 저장돼요. 센터에 전달되지 않아요.</span>
         </div>
         <ol aria-label="상담 진행 순서" className="grid gap-2 sm:grid-cols-3">
           {([['메일', '이메일 보내기'], ['예약', '예약했어요'], ['상담', '상담 다녀왔어요']] as const).map(([k, label], i) => {
@@ -172,7 +172,7 @@ export default function CounselPrep({ center, lawyer, dist, chosen, openReport, 
             return (
               <li key={k} aria-current={cur ? 'step' : undefined}
                 className={`flex items-center gap-2.5 rounded-xl border p-3 ${cur ? 'border-primary bg-primary text-primary-foreground' : done ? 'border-emerald-600/50 bg-emerald-600/10' : 'text-muted-foreground'}`}>
-                <span className={`flex size-6 shrink-0 items-center justify-center rounded-full border text-[13px] font-bold ${cur ? 'border-white bg-white text-primary' : done ? 'border-emerald-700 bg-emerald-700 text-white' : 'border-muted-foreground/40'}`}>{done ? <Check className="size-4" strokeWidth={3} /> : i + 1}</span>
+                <span className={`flex size-6 shrink-0 items-center justify-center rounded-full border text-sm font-bold ${cur ? 'border-white bg-white text-primary' : done ? 'border-emerald-700 bg-emerald-700 text-white' : 'border-muted-foreground/40'}`}>{done ? <Check className="size-4" strokeWidth={3} /> : i + 1}</span>
                 <span className="font-semibold">{label}</span>
               </li>
             )
@@ -180,7 +180,7 @@ export default function CounselPrep({ center, lawyer, dist, chosen, openReport, 
         </ol>
 
         <div id="bring-list">
-          <b className="text-sm">상담에 챙길 것</b> <span className="text-[13px] text-muted-foreground">· 내 사건(상담·계산·계약서 내용)에 맞춘 목록이에요</span>
+          <b className="text-sm">상담에 챙길 것</b> <span className="text-sm text-muted-foreground">· 내 사건(상담·계산·계약서 내용)에 맞춘 목록이에요</span>
           <ul className="mt-1.5 grid gap-1.5 sm:grid-cols-2">
             {bring.map((b) => (
               <li key={b} className="flex items-start gap-2 text-sm">
@@ -198,13 +198,13 @@ export default function CounselPrep({ center, lawyer, dist, chosen, openReport, 
               <b className="text-sm">1. 노무사에게 이메일 보내기</b>
               <Badge variant={res.checks.length ? 'default' : 'outline'}>{res.checks.length ? `챙길 것 ${res.checks.length}개 체크됨` : '챙길 것을 체크하면 열려요'}</Badge>
             </div>
-            <label className="grid gap-1 text-[13px] text-muted-foreground">받는 이메일 (노무사 이메일이 채워져 있어요. 직접 고칠 수 있어요)
+            <label className="grid gap-1 text-sm text-muted-foreground">받는 이메일 (노무사 이메일이 채워져 있어요. 직접 고칠 수 있어요)
               <Input type="email" value={mail.to} onChange={(e) => mail.setTo(e.target.value)} placeholder="name@example.com" aria-label="받는 이메일" disabled={!res.checks.length} aria-invalid={!!mail.to && !mail.valid} className="h-9 max-w-md text-foreground" />
             </label>
-            {mail.to && !mail.valid && <p className="text-[13px] text-destructive">이메일 형식이 올바르지 않아요.</p>}
+            {mail.to && !mail.valid && <p className="text-sm text-destructive">이메일 형식이 올바르지 않아요.</p>}
             <div className="flex flex-wrap items-center gap-2">
               <Button disabled={!res.checks.length || !mail.valid} onClick={() => mail.onSend(center)}><Send /> 메일 작성하고 보내기</Button>
-              <span className="text-[13px] text-muted-foreground">체크한 자료와 AI 상담·계산·계약서 내용이 메일 초안에 들어가요. 보내기 전에 한 번 더 확인해요.</span>
+              <span className="text-sm text-muted-foreground">체크한 자료와 AI 상담·계산·계약서 내용이 메일 초안에 들어가요. 보내기 전에 한 번 더 확인해요.</span>
             </div>
             <Button variant="ghost" size="sm" className="justify-self-start text-muted-foreground" onClick={() => update({ mailed: true, method })}>이메일 대신 전화로 연락했어요 → 다음 단계로</Button>
           </div>
@@ -217,7 +217,7 @@ export default function CounselPrep({ center, lawyer, dist, chosen, openReport, 
               <Button onClick={() => { update({ status: 'booked', method }); setEditing(true) }}><CalendarPlus /> 2. 예약했어요</Button>
               <Button variant="ghost" size="sm" onClick={() => update({ mailed: false, method })}>이메일 다시 보내기</Button>
             </div>
-            <p className="text-[13px] text-muted-foreground">답장이 없으면 센터 노동상담 전화로 예약할 수 있어요. 아래 “이 센터의 상담 정보”에서 번호를 확인하세요.</p>
+            <p className="text-sm text-muted-foreground">답장이 없으면 센터 노동상담 전화로 예약할 수 있어요. 아래 “이 센터의 상담 정보”에서 번호를 확인하세요.</p>
           </div>
         )}
 
@@ -225,8 +225,8 @@ export default function CounselPrep({ center, lawyer, dist, chosen, openReport, 
           <div className="pop-in grid gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
             <b className="text-sm">언제 상담을 예약하셨나요?</b>
             <div className="flex flex-wrap items-end gap-2">
-              <label className="grid gap-1 text-[13px] text-muted-foreground">날짜<Input id="res-date" type="date" value={res.date} onChange={(e) => update({ date: e.target.value, method })} className="h-9 w-44" /></label>
-              <label className="grid gap-1 text-[13px] text-muted-foreground">시간<Input id="res-time" type="time" value={res.time} onChange={(e) => update({ time: e.target.value, method })} className="h-9 w-32" /></label>
+              <label className="grid gap-1 text-sm text-muted-foreground">날짜<Input id="res-date" type="date" value={res.date} onChange={(e) => update({ date: e.target.value, method })} className="h-9 w-44" /></label>
+              <label className="grid gap-1 text-sm text-muted-foreground">시간<Input id="res-time" type="time" value={res.time} onChange={(e) => update({ time: e.target.value, method })} className="h-9 w-32" /></label>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <Button disabled={!res.date || !res.time} onClick={() => { setEditing(false); setThanks('booked') }}><Check /> 예약 기록 저장하기</Button>
@@ -257,7 +257,7 @@ export default function CounselPrep({ center, lawyer, dist, chosen, openReport, 
           </div>
         )}
 
-        <div className="flex flex-wrap items-center gap-2 text-[13px] text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
           <span aria-live="polite" className="font-medium text-primary">{flash}</span>
           <Button variant="ghost" size="sm" className="ml-auto h-7 px-2" onClick={() => { clearReservations(); setRes(loadReservation(center.name)); note('저장된 진행 기록을 지웠어요') }}><Trash2 /> 기록 지우기</Button>
         </div>
@@ -287,10 +287,10 @@ export default function CounselPrep({ center, lawyer, dist, chosen, openReport, 
             {thanks === 'done' ? (
               <Button variant="outline" onClick={() => { setThanks(null); resetAll() }}><Trash2 /> 처음으로 돌아가기 (입력한 내용 모두 지우기)</Button>
             ) : (
-              <button type="button" onClick={() => { setThanks(null); setView('home'); window.scrollTo({ top: 0 }) }} className="text-[13px] text-muted-foreground underline underline-offset-2">처음 화면으로 가기</button>
+              <button type="button" onClick={() => { setThanks(null); setView('home'); window.scrollTo({ top: 0 }) }} className="text-sm text-muted-foreground underline underline-offset-2">처음 화면으로 가기</button>
             )}
           </div>
-          {thanks === 'done' && <p className="text-[13px] text-muted-foreground">“처음으로 돌아가기”를 누르면 이 기기에 입력한 계산·계약서·진정서·상담 내용과 예약 기록이 모두 지워져요. 필요한 PDF는 미리 저장해 두세요.</p>}          <p className="text-[13px] text-muted-foreground">예약은 직접 하신 기록이에요. 센터에 전달되지 않으니, 상담 전에 전화로 한 번 더 확인해 주세요.</p>
+          {thanks === 'done' && <p className="text-sm text-muted-foreground">“처음으로 돌아가기”를 누르면 이 기기에 입력한 계산·계약서·진정서·상담 내용과 예약 기록이 모두 지워져요. 필요한 PDF는 미리 저장해 두세요.</p>}          <p className="text-sm text-muted-foreground">예약은 직접 하신 기록이에요. 센터에 전달되지 않으니, 상담 전에 전화로 한 번 더 확인해 주세요.</p>
         </DialogContent>
       </Dialog>
 

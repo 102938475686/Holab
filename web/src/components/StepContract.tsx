@@ -211,7 +211,7 @@ export default function StepContract() {
             {pct !== null && (
               <div className="grid gap-1.5">
                 <Progress value={pct} />
-                <p className="text-[13px] text-muted-foreground">{pctText}</p>
+                <p className="text-sm text-muted-foreground">{pctText}</p>
               </div>
             )}
             {retry && (
@@ -234,7 +234,7 @@ export default function StepContract() {
           <div className="grid gap-3">
             <h3 className="flex items-center gap-2 font-semibold"><Lock className="size-4" /> 개인정보 마스킹 결과 <Badge variant="secondary">{maskCount}곳 가림</Badge></h3>
             <p className="text-sm text-muted-foreground">아래 내용만 AI에 전송됩니다.</p>
-            <ul className="list-disc space-y-0.5 pl-5 text-[13px] text-muted-foreground">
+            <ul className="list-disc space-y-0.5 pl-5 text-sm text-muted-foreground">
               <li><b className="text-foreground">글자가 잘못 읽혔을 수 있어요.</b> 시급·근로시간·날짜 같은 숫자가 맞는지 확인하고 틀리면 아래에서 직접 고치세요.</li>
               <li>가려지지 않은 개인정보가 있으면 지운 뒤 분석하세요.</li>
               <li>고친 내용은 <b className="text-foreground">다시 분석하기</b>로 바로 반영돼요.</li>
@@ -247,7 +247,7 @@ export default function StepContract() {
                     <div key={k.label} className="flex gap-2"><dt className="shrink-0 text-muted-foreground">{k.label}</dt><dd className="font-semibold">{k.value}</dd></div>
                   ))}
                 </dl>
-                <p className="text-[13px] text-muted-foreground">다르면 아래 글에서 직접 고친 뒤 분석하세요. 분석 결과는 이 숫자를 기준으로 나와요.</p>
+                <p className="text-sm text-muted-foreground">다르면 아래 글에서 직접 고친 뒤 분석하세요. 분석 결과는 이 숫자를 기준으로 나와요.</p>
               </div>
             )}
             <Textarea ref={taRef} rows={11} value={masked} onChange={(e) => setMasked(e.target.value)} />
@@ -255,7 +255,7 @@ export default function StepContract() {
             <div className="flex flex-wrap items-center gap-3">
               <Button variant={analysis ? 'outline' : 'default'} onClick={analyze} disabled={busy}>{busy ? '분석 중…' : analysis ? '다시 분석하기' : 'AI로 계약서 분석하기'}</Button>
               {/* 평가용 RAG ON/OFF: 주소에 ?eval=1이 있을 때만 노출 */}
-              {new URLSearchParams(location.search).has('eval') && <label className="flex cursor-pointer items-center gap-2 text-[13px] text-muted-foreground">
+              {new URLSearchParams(location.search).has('eval') && <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
                 <Checkbox checked={useRag} onCheckedChange={(v) => setUseRag(!!v)} />
                 법령 근거 검색 사용 <span className="text-muted-foreground/80">(끄고 다시 분석하면 AI 단독 판단과 비교할 수 있어요)</span>
               </label>}
@@ -295,10 +295,10 @@ function AnalysisView({ a, onDispute, onRemove }: { a: Analysis; onDispute: () =
       </h3>
       {/* 한눈에 보는 요약: 몇 건이 얼마나 심각한지 먼저 */}
       <div className="flex flex-wrap items-center gap-2 rounded-xl border p-3 text-sm">
-        <span className={`rounded-full px-2.5 py-0.5 text-[13px] font-bold ${SEV.high.cls}`}>{SEV.high.label} {count('high')}건</span>
-        <span className={`rounded-full px-2.5 py-0.5 text-[13px] font-bold ${SEV.medium.cls}`}>{SEV.medium.label} {count('medium')}건</span>
-        <span className={`rounded-full px-2.5 py-0.5 text-[13px] font-bold ${SEV.low.cls}`}>{SEV.low.label} {count('low')}건</span>
-        {!!a.missing?.length && <span className="text-[13px] text-muted-foreground">· 빠진 항목 {a.missing.length}개</span>}
+        <span className={`rounded-full px-2.5 py-0.5 text-sm font-bold ${SEV.high.cls}`}>{SEV.high.label} {count('high')}건</span>
+        <span className={`rounded-full px-2.5 py-0.5 text-sm font-bold ${SEV.medium.cls}`}>{SEV.medium.label} {count('medium')}건</span>
+        <span className={`rounded-full px-2.5 py-0.5 text-sm font-bold ${SEV.low.cls}`}>{SEV.low.label} {count('low')}건</span>
+        {!!a.missing?.length && <span className="text-sm text-muted-foreground">· 빠진 항목 {a.missing.length}개</span>}
       </div>
       {a.summary && <p className="text-base leading-relaxed">{a.summary}</p>}
       {a.clauses.length === 0 && <p className="text-sm text-muted-foreground">문제 소지가 있는 조항이 발견되지 않았습니다.</p>}
@@ -307,32 +307,32 @@ function AnalysisView({ a, onDispute, onRemove }: { a: Analysis; onDispute: () =
         return (
           <div key={i} className={`grid gap-3 rounded-xl border border-l-4 p-4 ${c.severity === 'high' ? 'border-l-destructive' : c.severity === 'medium' ? 'border-l-amber-500' : 'border-l-slate-400'}`}>
             <div className="flex flex-wrap items-center gap-2">
-              <span className={`rounded-full px-2.5 py-0.5 text-[13px] font-bold ${(SEV[c.severity] ?? SEV.low).cls}`}>{(SEV[c.severity] ?? SEV.low).label}</span>
+              <span className={`rounded-full px-2.5 py-0.5 text-sm font-bold ${(SEV[c.severity] ?? SEV.low).cls}`}>{(SEV[c.severity] ?? SEV.low).label}</span>
               <b className="text-base">{c.title}</b>
               <Badge variant="outline" className="ml-auto">{lv}</Badge>
             </div>
             {c.quote && (
               <div>
-                <p className="text-[13px] font-semibold text-muted-foreground">계약서에 적힌 문장</p>
+                <p className="text-sm font-semibold text-muted-foreground">계약서에 적힌 문장</p>
                 <blockquote className="mt-1 rounded-md bg-muted px-3 py-2 text-sm">“{c.quote}”</blockquote>
               </div>
             )}
             <div>
-              <p className="text-[13px] font-semibold text-muted-foreground">무엇이 문제인가요</p>
+              <p className="text-sm font-semibold text-muted-foreground">무엇이 문제인가요</p>
               <p className="mt-1 text-sm leading-relaxed">{c.issue}</p>
             </div>
             {c.law && (
               <div>
-                <p className="text-[13px] font-semibold text-muted-foreground">법 기준</p>
+                <p className="text-sm font-semibold text-muted-foreground">법 기준</p>
                 <p className="mt-1 text-sm font-medium text-primary">{c.law}</p>
               </div>
             )}
             <Accordion className="rounded-lg border bg-muted/40 px-3">
               <AccordionItem value="law" className="border-0">
-                <AccordionTrigger className="py-2 text-[13px] font-semibold text-primary">
+                <AccordionTrigger className="py-2 text-sm font-semibold text-primary">
                   <span className="flex items-center gap-1.5"><BookOpen className="size-3.5" /> 근거 자세히 보기{c.lawText ? ` · ${c.lawText.name} ${c.lawText.article}` : ''}</span>
                 </AccordionTrigger>
-                <AccordionContent className="grid gap-2 text-[13px] leading-relaxed">
+                <AccordionContent className="grid gap-2 text-sm leading-relaxed">
                   <p className="text-muted-foreground">{CERTAINTY[c.severity] ?? CERTAINTY.low}</p>
                   {a.rag?.used && (c.evidence
                     ? <p><b>검색된 근거</b> <span className="text-muted-foreground">{c.evidence.title} — {c.evidence.text}</span></p>
@@ -347,7 +347,7 @@ function AnalysisView({ a, onDispute, onRemove }: { a: Analysis; onDispute: () =
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
-            <Button variant="ghost" size="sm" className="h-auto justify-self-start px-0 text-[13px] text-muted-foreground" onClick={() => onRemove(i)}>이 지적이 맞지 않아요 (빼기)</Button>
+            <Button variant="ghost" size="sm" className="h-auto justify-self-start px-0 text-sm text-muted-foreground" onClick={() => onRemove(i)}>이 지적이 맞지 않아요 (빼기)</Button>
           </div>
         )
       })}
@@ -355,10 +355,10 @@ function AnalysisView({ a, onDispute, onRemove }: { a: Analysis; onDispute: () =
         <div className="grid gap-2">
           <h4 className="text-sm font-semibold">계약서에 없거나 확인이 안 된 항목</h4>
           <div className="flex flex-wrap gap-1.5">{a.missing.map((m) => <Badge key={m} variant="secondary">{m}</Badge>)}</div>
-          <p className="text-[13px] text-muted-foreground">근로계약서에는 임금, 소정근로시간, 휴일, 연차휴가 등이 명시되어야 합니다. (근로기준법 제17조)</p>
+          <p className="text-sm text-muted-foreground">근로계약서에는 임금, 소정근로시간, 휴일, 연차휴가 등이 명시되어야 합니다. (근로기준법 제17조)</p>
         </div>
       )}
-      <div className="grid gap-1.5 border-t pt-3 text-[13px] text-muted-foreground">
+      <div className="grid gap-1.5 border-t pt-3 text-sm text-muted-foreground">
         <p>
           {a.rag?.used ? <>법령 근거 검색 사용 · 참고한 조문 {a.rag.sources.length}개{a.rag.sources.length ? `: ${a.rag.sources.join(', ')}` : ''}</> : <>법령 근거 검색 미사용 (AI 단독 판단)</>}
         </p>
@@ -440,7 +440,7 @@ function ContractJudge({ analysis }: { analysis: Analysis }) {
     >
       {ai?.summary && <p>{ai.summary}</p>}
       {received > 0 && (contractMonthly > 0 || legalMonthly > 0) && (
-        <dl className="grid gap-1 rounded-lg bg-muted/50 p-3 text-[13px]">
+        <dl className="grid gap-1 rounded-lg bg-muted/50 p-3 text-sm">
           {contractMonthly > 0 && <div className="flex justify-between gap-3"><dt className="text-muted-foreground">계약서 기준 월 금액</dt><dd>{won(contractMonthly)}</dd></div>}
           {legalMonthly > 0 && <div className="flex justify-between gap-3"><dt className="text-muted-foreground">법적으로 받아야 할 월 금액</dt><dd>{won(legalMonthly)}</dd></div>}
           <div className="flex justify-between gap-3 font-semibold"><dt>실제로 받은 월 금액</dt><dd>{won(received)}</dd></div>
@@ -448,11 +448,11 @@ function ContractJudge({ analysis }: { analysis: Analysis }) {
       )}
       <ul className="list-disc space-y-1 pl-5 text-muted-foreground">{facts.map((f) => <li key={f}>{f}</li>)}</ul>
       {!received && (
-        <p className="text-[13px] text-muted-foreground">
-          '못 받은 돈 확인'에서 실제로 받은 금액을 넣으면 계약서·법적 기준과 비교해 드려요. <Button variant="link" size="sm" className="h-auto p-0 text-[13px]" onClick={() => go(1)}>못 받은 돈 확인으로 가기</Button>
+        <p className="text-sm text-muted-foreground">
+          '못 받은 돈 확인'에서 실제로 받은 금액을 넣으면 계약서·법적 기준과 비교해 드려요. <Button variant="link" size="sm" className="h-auto p-0 text-sm" onClick={() => go(1)}>못 받은 돈 확인으로 가기</Button>
         </p>
       )}
-      <p className="text-[13px] text-muted-foreground">맞지 않는 지적은 위에서 “이 지적이 맞지 않아요”로 빼면 판단이 바로 달라져요.</p>
+      <p className="text-sm text-muted-foreground">맞지 않는 지적은 위에서 “이 지적이 맞지 않아요”로 빼면 판단이 바로 달라져요.</p>
     </JudgmentCard>
     <LegalIssues issues={legalList} heading="한눈에 보는 관련 법 조항" />
     </>

@@ -87,7 +87,7 @@ export default function ComplaintAssistant({
         </DialogHeader>
 
         {reflected.length > 0 && (
-          <div className="rounded-lg border bg-muted/40 p-2.5 text-[13px] text-muted-foreground">
+          <div className="rounded-lg border bg-muted/40 p-2.5 text-sm text-muted-foreground">
             <span className="mr-1.5 font-semibold text-foreground">이미 반영된 내용</span>
             {reflected.map((r) => <Badge key={r} variant="secondary" className="mr-1 mt-1">{r}</Badge>)}
           </div>
@@ -116,7 +116,7 @@ export default function ComplaintAssistant({
         </div>
 
         {notes.length > 0 && (
-          <div className="rounded-lg border border-primary/30 bg-primary/10 p-2.5 text-[13px]">
+          <div className="rounded-lg border border-primary/30 bg-primary/10 p-2.5 text-sm">
             <div className="mb-1 flex items-center gap-1 font-semibold text-foreground"><NotebookPen className="size-3.5" /> 초안에 반영될 내용</div>
             <ul className="list-disc space-y-0.5 pl-4 text-muted-foreground">{notes.map((n, i) => <li key={i}>{n}</li>)}</ul>
           </div>
@@ -136,7 +136,7 @@ export default function ComplaintAssistant({
         </form>
 
         <DialogFooter className="items-center sm:justify-between">
-          <p className="text-[13px] text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             {ready ? '정보가 충분해요. 초안을 만들어 볼까요?' : userCount === 0 ? '말씀하지 않아도 분석된 내용만으로 초안을 만들 수 있어요.' : '더 말씀하셔도 되고, 지금 초안을 만들 수도 있어요.'}
           </p>
           <div className="flex gap-2">

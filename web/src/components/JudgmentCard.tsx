@@ -29,7 +29,7 @@ export default function JudgmentCard({
 }) {
   return (
     <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 text-sm" aria-busy={loading}>
-      <div className="flex flex-wrap items-center gap-2 text-[13px] font-semibold text-primary">
+      <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-primary">
         {title}
         {loading ? <Badge variant="secondary"><Sparkles className="animate-pulse" /> AI가 살펴보는 중…</Badge>
           : ai ? <Badge variant="secondary"><Sparkles /> AI 판단</Badge>
@@ -46,7 +46,7 @@ export default function JudgmentCard({
           {chips.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
               {chips.map((c) => (
-                <span key={c.label} className={`rounded-lg border px-2.5 py-1 text-[13px] ${TONE[c.tone ?? 'ok'] ?? ''}`}>
+                <span key={c.label} className={`rounded-lg border px-2.5 py-1 text-sm ${TONE[c.tone ?? 'ok'] ?? ''}`}>
                   {c.label} <b>{c.value}</b>
                 </span>
               ))}
@@ -60,7 +60,7 @@ export default function JudgmentCard({
           )}
           {children && (
             <details className="group mt-3 rounded-lg bg-background/70 p-3">
-              <summary className="flex cursor-pointer list-none items-center gap-1 text-[13px] font-semibold text-muted-foreground">
+              <summary className="flex cursor-pointer list-none items-center gap-1 text-sm font-semibold text-muted-foreground">
                 판단 근거 자세히 보기 <ChevronDown className="size-4 transition-transform group-open:rotate-180" />
               </summary>
               <div className="mt-2 grid gap-2 leading-relaxed">{children}</div>

@@ -118,15 +118,15 @@ export default function PrivacyConsent() {
                   </div>
                   {age === 'under' && (
                     <div className="grid gap-2 rounded-lg bg-amber-50 p-3 text-amber-950">
-                      <p className="text-[13px]">만 14세 미만은 법에 따라 <b>보호자(부모님 등)의 동의</b>가 꼭 필요해요. 보호자와 함께 위 내용을 읽어 주세요.</p>
+                      <p className="text-sm">만 14세 미만은 법에 따라 <b>보호자(부모님 등)의 동의</b>가 꼭 필요해요. 보호자와 함께 위 내용을 읽어 주세요.</p>
                       <Check id="pc-guardian" checked={guardian} onChange={setGuardian}><b>[필수]</b> 보호자가 위 내용을 확인하고 동의했어요.</Check>
                     </div>
                   )}
                 </div>
-                {declined && <p className="rounded-lg bg-muted p-2.5 text-[13px]">동의하지 않으면 HoLab 기능을 쓸 수 없어요. 고용노동부 고객상담센터 <b>☎ 1350</b>(평일 9~18시)에 전화하면 무료로 상담받을 수 있어요. 마음이 바뀌면 위에 체크하고 시작해 주세요.</p>}
+                {declined && <p className="rounded-lg bg-muted p-2.5 text-sm">동의하지 않으면 HoLab 기능을 쓸 수 없어요. 고용노동부 고객상담센터 <b>☎ 1350</b>(평일 9~18시)에 전화하면 무료로 상담받을 수 있어요. 마음이 바뀌면 위에 체크하고 시작해 주세요.</p>}
               </div>
             ) : (
-              <p className="rounded-lg bg-muted/60 p-2.5 text-[13px] text-muted-foreground">
+              <p className="rounded-lg bg-muted/60 p-2.5 text-sm text-muted-foreground">
                 {new Date(saved!.at).toLocaleDateString('ko-KR')}에 동의했어요{saved!.under14 ? ' (만 14세 미만, 보호자 동의)' : ''}.
               </p>
             )}

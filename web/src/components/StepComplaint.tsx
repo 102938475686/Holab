@@ -144,7 +144,7 @@ export default function StepComplaint() {
     <Card>
       <CardHeader>
         <CardTitle className="text-xl">노동청 진정서 작성 보조</CardTitle>
-        <CardDescription>고용노동부 <b>진정서 양식</b> 그대로 작성됩니다. 인적사항(성명·주민번호 등)은 <b>이 브라우저에만</b> 입력되며 AI에는 전송되지 않습니다. 계약서·계산 결과에서 알 수 있는 항목은 자동으로 채워집니다.</CardDescription>
+        <CardDescription>고용노동부 <b>진정서 양식</b>에 맞춰 써요. 계약서·계산 결과로 알 수 있는 칸은 자동으로 채워져요.<span className="mt-1 block">🔒 이름·주민번호는 AI에 보내지 않고 PDF에만 들어가요.</span></CardDescription>
       </CardHeader>
       <CardContent className="grid gap-6">
         {/* AI에 전달되는 사실관계를 항목별 목록으로: 초안을 만들기 전에 틀린 게 없는지 한눈에 확인 */}
@@ -178,11 +178,11 @@ export default function StepComplaint() {
                 </ul>
               </div>
             )}
-            <p className="text-[13px] text-muted-foreground">틀린 내용이 있으면 해당 단계(못 받은 돈 확인·계약서 분석)에서 고치거나, “있었던 일의 순서”를 수정하세요.</p>
+            <p className="text-sm text-muted-foreground">틀린 내용이 있으면 해당 단계(못 받은 돈 확인·계약서 분석)에서 고치거나, “있었던 일의 순서”를 수정하세요.</p>
           </div>
         </details>
 
-        <ol className="flex flex-wrap gap-1.5 text-[13px]" aria-label="진정서 작성 단계">
+        <ol className="flex flex-wrap gap-1.5 text-sm" aria-label="진정서 작성 단계">
           {SUBS.map((s, i) => (
             <li key={s}>
               <button type="button" onClick={() => setSub(i + 1)} className={'rounded-full border px-3 py-1 ' + (sub === i + 1 ? 'border-primary bg-primary text-primary-foreground' : sub > i + 1 ? 'border-emerald-500/50 text-emerald-700' : 'text-muted-foreground')}>{i + 1}. {s}</button>
@@ -191,7 +191,7 @@ export default function StepComplaint() {
         </ol>
 
         {sub === 1 && auto.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1.5 rounded-lg bg-primary/10 p-3 text-[13px]">
+          <div className="flex flex-wrap items-center gap-1.5 rounded-lg bg-primary/10 p-3 text-sm">
             <Badge>자동 입력</Badge>
             <span>계산·계약서에서 가져와 채운 항목이에요. 맞는지 확인하세요:</span>
             {auto.map((k) => <Badge key={k} variant="secondary">{AUTO_LABEL[k] ?? k}</Badge>)}
@@ -241,7 +241,7 @@ export default function StepComplaint() {
               <Button variant="outline" size="sm" onClick={() => { markAuto(['timeline'], 'AI 상담'); setForm({ timeline: [form.timeline.trim(), ...consultNotes.filter((n) => /\d{1,4}\s*[.년월/-]\s*\d|월\s*\d+일/.test(n))].filter(Boolean).join('\n') }) }}>AI 상담 내용에서 날짜 있는 일 가져오기</Button>
             </div>
           )}
-          <p className="text-[13px] text-muted-foreground">적어 주신 순서는 AI 초안에 “경과”로 반영돼요. 날짜가 정확하지 않으면 “9월 초”처럼 적어도 돼요.</p>
+          <p className="text-sm text-muted-foreground">적어 주신 순서는 AI 초안에 “경과”로 반영돼요. 날짜가 정확하지 않으면 “9월 초”처럼 적어도 돼요.</p>
         </div>}
 
         {sub === 4 && <div className="grid gap-3">
@@ -251,7 +251,7 @@ export default function StepComplaint() {
             {form.draft.trim().length <= 20 && <Badge variant="outline" className="text-primary">추천</Badge>}
             <Button variant="ghost" size="sm" onClick={draft} disabled={busy} className="text-muted-foreground"><Sparkles /> {busy ? '작성 중…' : '또는, 상담 없이 바로 초안 만들기'}</Button>
             {badge && <Badge variant={badge.demo ? 'outline' : 'default'}>{badge.demo ? '기본 서식 초안' : badge.consulted ? 'AI 상담 반영 초안' : 'AI 초안'}</Badge>}
-            <span className="w-full text-[13px] text-muted-foreground">넣고 싶은 이야기를 AI와 상담하듯 알려 주면, 분석된 내용과 함께 그걸 바탕으로 초안을 써 드려요.</span>
+            <span className="w-full text-sm text-muted-foreground">넣고 싶은 이야기를 AI와 상담하듯 알려 주면, 분석된 내용과 함께 그걸 바탕으로 초안을 써 드려요.</span>
           </div>
           <Field label="내용 (직접 수정할 수 있습니다)" auto={autoSrc.draft}>
             <Textarea rows={12} value={form.draft} onChange={(e) => { clearAuto('draft'); setForm({ draft: e.target.value }) }} placeholder="[AI 상담으로 내용 작성] 또는 [바로 초안 만들기]를 누르면 초안이 생성됩니다." />
@@ -263,7 +263,7 @@ export default function StepComplaint() {
         </div>}
 
         {sub === 5 && <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-lg border p-3.5 text-[13px]">
+          <div className="rounded-lg border p-3.5 text-sm">
             <div className="mb-1.5 font-semibold text-foreground">제출 전 최종 확인</div>
             <ul className="grid gap-1">
               {checks.map((c) => (
@@ -274,7 +274,7 @@ export default function StepComplaint() {
             </ul>
             <p className="mt-1.5 text-muted-foreground">비어 있어도 PDF는 만들 수 있지만, 접수 전에 채우는 게 좋아요.</p>
           </div>
-          <div className="rounded-lg border p-3.5 text-[13px] sm:col-span-2">
+          <div className="rounded-lg border p-3.5 text-sm sm:col-span-2">
             <div className="mb-1 font-semibold text-foreground">내 사건의 쟁점과 증빙자료</div>
             <p className="mb-2 text-muted-foreground">각 쟁점을 어떤 자료로 보여줄 수 있는지 묶었어요. 갖고 있는 자료를 체크하세요. (상담 준비 리포트의 체크리스트와 같이 저장돼요)</p>
             <div className="grid gap-3">
@@ -310,7 +310,7 @@ export default function StepComplaint() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <Button size="lg" onClick={download} disabled={!ready || pdfBusy}><FileDown /> {pdfBusy ? 'PDF 만드는 중…' : '진정서 PDF 다운로드'}</Button>
-            <span className="text-[13px] text-muted-foreground">{ready ? 'PDF를 저장하면 노무사 매칭으로 이어갈지 물어봐요. (양식: 고용노동부 진정서)' : '위 동의에 체크하고 진정 내용을 채우면 PDF를 만들 수 있어요.'}</span>
+            <span className="text-sm text-muted-foreground">{ready ? 'PDF를 저장하면 노무사 매칭으로 이어갈지 물어봐요. (양식: 고용노동부 진정서)' : '위 동의에 체크하고 진정 내용을 채우면 PDF를 만들 수 있어요.'}</span>
           </div>
         </div>}
 

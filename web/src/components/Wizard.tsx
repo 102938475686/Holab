@@ -18,14 +18,6 @@ const FEATURES = [
   { n: 4, label: '노무사 매칭', hint: '노무사 · 상담 준비 · 메일', icon: MapPin },
 ]
 
-// 단계마다 "무엇을 하는 곳인지"와 그 단계에서 개인정보가 어떻게 다뤄지는지를 한 줄로 알려 줌
-const ROLE = [
-  { what: '못 받은 돈 확인: 받아야 할 돈과 못 받은 돈을 계산해요.', privacy: '입력한 숫자는 이 기기에서만 계산돼요.' },
-  { what: '계약서 분석: 계약서에 불리한 조항이 있는지 점검해요.', privacy: '이름·연락처는 가린 글자만 AI에 전송돼요.' },
-  { what: '진정서 작성: 노동청에 낼 진정서 초안을 만들어요.', privacy: '성명·주민번호는 AI에 보내지 않고, PDF에만 들어가요.' },
-  { what: '노무사 매칭: 내 사건에 맞는 노무사를 매칭하고 준비물을 챙겨 메일로 보내요.', privacy: '위치와 예약 기록은 이 기기에만 저장돼요.' },
-]
-
 // 헤더·탭·본문·푸터가 같은 폭과 좌우 여백을 쓰도록 하나의 컨테이너 규격으로 통일
 const WRAP = 'mx-auto w-full max-w-[76rem] px-4 2xl:max-w-[94rem] sm:px-6'
 
@@ -88,10 +80,8 @@ export default function Wizard() {
               )
             })}
           </TabsList>
-          <p className="text-base leading-relaxed">
-            <b>{ROLE[step - 1]?.what}</b>
-            <span className="mt-1 block text-sm text-muted-foreground">{ROLE[step - 1]?.privacy}</span>
-          </p>          <TabsContent value="1"><StepCalc /></TabsContent>
+          {/* 기능 설명·개인정보 안내는 각 화면 카드 제목 아래에 한 번만 보여 줘요 */}
+          <TabsContent value="1"><StepCalc /></TabsContent>
           <TabsContent value="2"><StepContract /></TabsContent>
           <TabsContent value="3"><StepComplaint /></TabsContent>
           <TabsContent value="4"><StepLawyer /></TabsContent>
@@ -100,7 +90,7 @@ export default function Wizard() {
         </div>
         <BriefingGuide mode="float" />
       </main>
-      <footer className={`${WRAP} pb-8 text-center text-[13px] text-muted-foreground`}>HoLab · 1팀 김연우 · 김연호 · 노유승 · 차도현 · SDGs 8.8 노동권 보호</footer>
+      <footer className={`${WRAP} pb-8 text-center text-sm text-muted-foreground`}>HoLab · 1팀 김연우 · 김연호 · 노유승 · 차도현 · SDGs 8.8 노동권 보호</footer>
     </div>
   )
 }

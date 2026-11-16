@@ -22,7 +22,7 @@ function Law({ title }: { title: string }) {
     } catch { setState('err') }
   }
   return (
-    <details className="text-[13px]" onToggle={(e) => open((e.currentTarget as HTMLDetailsElement).open)}>
+    <details className="text-sm" onToggle={(e) => open((e.currentTarget as HTMLDetailsElement).open)}>
       <summary className="cursor-pointer font-medium text-primary">조문 원문 보기 (법제처)</summary>
       <div className="mt-1.5 rounded-md bg-muted/50 p-2.5 leading-relaxed">
         {state === 'busy' && <span className="text-muted-foreground">불러오는 중…</span>}
@@ -48,12 +48,12 @@ export default function LegalIssues({ issues, heading = '관련 법 조항', loa
             <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" aria-hidden="true" />
           </summary>
           <div className="grid gap-1.5 px-3 pb-3">
-            <span className="text-[13px] text-muted-foreground">{x.basis === 'document' ? '계약서 등 확실한 자료가 근거예요' : '직접 확인할 자료가 아직 없어 단정하지 않아요'}</span>
-            {x.quote && <p className="text-[13px] italic text-muted-foreground">“{x.quote}”</p>}
+            <span className="text-sm text-muted-foreground">{x.basis === 'document' ? '계약서 등 확실한 자료가 근거예요' : '직접 확인할 자료가 아직 없어 단정하지 않아요'}</span>
+            {x.quote && <p className="text-sm italic text-muted-foreground">“{x.quote}”</p>}
             {x.plain && <p className="leading-relaxed">{x.plain}</p>}
             {x.situation && <p className="leading-relaxed"><b>내 상황</b> · {x.situation}</p>}
             {x.checks && x.checks.length > 0 && (
-              <div className="text-[13px]">
+              <div className="text-sm">
                 <b>먼저 확인·준비해 두면 좋은 것</b>
                 <ul className="mt-0.5 list-disc pl-5 text-muted-foreground">{x.checks.map((c) => <li key={c}>{c}</li>)}</ul>
               </div>

@@ -167,14 +167,14 @@ export default function TriageAssistant() {
               </div>
             )}
 
-            {evalMode && <label className="flex cursor-pointer items-center gap-2 text-[13px] text-muted-foreground"><input type="checkbox" checked={useRag} onChange={(e) => setUseRag(e.target.checked)} /> 법령 검색(RAG) 사용 <span>(끄고 새로 말하면 AI 단독 판단과 비교할 수 있어요)</span></label>}
+            {evalMode && <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground"><input type="checkbox" checked={useRag} onChange={(e) => setUseRag(e.target.checked)} /> 법령 검색(RAG) 사용 <span>(끄고 새로 말하면 AI 단독 판단과 비교할 수 있어요)</span></label>}
             <form onSubmit={(e) => { e.preventDefault(); send(q) }} className="flex items-center gap-2">
               <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="있었던 일을 적어 주세요" aria-label="상황 입력" disabled={busy} className="h-10" />
               <Button type="submit" size="icon" className="size-10" aria-label="보내기" disabled={!q.trim() || busy}><ArrowUp /></Button>
             </form>
-            <p className="text-[13px] text-muted-foreground">입력한 내용의 이름·연락처 등은 가려서 전송돼요.</p>
+            <p className="text-sm text-muted-foreground">입력한 내용의 이름·연락처 등은 가려서 전송돼요.</p>
             <div className="flex flex-wrap items-center gap-1.5 pt-1">
-              <span className="text-[13px] text-muted-foreground">바로 기능으로:</span>
+              <span className="text-sm text-muted-foreground">바로 기능으로:</span>
               {Object.values(FEATURE).map((f) => (
                 <Button key={f.step} variant="ghost" size="sm" onClick={() => start(f.step)}>{f.label}</Button>
               ))}
@@ -208,25 +208,25 @@ export default function TriageAssistant() {
 
             {state && (state.ranking?.length ?? 0) > 0 && (
               <div className="pop-in grid gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-5">
-                <div className="flex flex-wrap items-center gap-2 text-[13px] font-semibold text-primary">HoLab의 판단{state.rankingTentative && <Badge variant="outline">잠정</Badge>}</div>
+                <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-primary">HoLab의 판단{state.rankingTentative && <Badge variant="outline">잠정</Badge>}</div>
                 {(() => {
                   const [top, ...rest] = state.ranking!
                   return (
                     <>
                       <div>
-                        <p className="text-xs text-muted-foreground">가장 먼저 추천해요</p>
+                        <p className="text-sm text-muted-foreground">가장 먼저 추천해요</p>
                         <p className="text-xl font-extrabold leading-snug tracking-tight">{FEATURE[top.key].label.replace('하기', '')}</p>
                         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{top.reason}</p>
                         <Button className="mt-3" size="sm" onClick={() => start(FEATURE[top.key].step)}>{FEATURE[top.key].label}<ArrowRight /></Button>
-                        {state.rankingTentative && <p className="mt-2 text-[13px] text-muted-foreground">말씀하신 내용이 아직 적어서 잠정이에요. 질문에 답하면 더 정확해져요.</p>}
+                        {state.rankingTentative && <p className="mt-2 text-sm text-muted-foreground">말씀하신 내용이 아직 적어서 잠정이에요. 질문에 답하면 더 정확해져요.</p>}
                       </div>
                       {rest.length > 0 && (
                         <details className="group rounded-lg bg-background/70 p-3">
-                          <summary className="cursor-pointer list-none text-[13px] font-semibold text-muted-foreground">다른 추천 {rest.length}개 보기</summary>
+                          <summary className="cursor-pointer list-none text-sm font-semibold text-muted-foreground">다른 추천 {rest.length}개 보기</summary>
                           <div className="mt-2 grid gap-2">
                             {rest.map((r, i) => (
                               <div key={r.key} className="flex flex-wrap items-center justify-between gap-2 border-t pt-2 first:border-t-0 first:pt-0">
-                                <div className="min-w-0 flex-1 text-sm"><b>{i + 2}순위 · {FEATURE[r.key].label.replace('하기', '')}</b><span className="block text-[13px] text-muted-foreground">{r.reason}</span></div>
+                                <div className="min-w-0 flex-1 text-sm"><b>{i + 2}순위 · {FEATURE[r.key].label.replace('하기', '')}</b><span className="block text-sm text-muted-foreground">{r.reason}</span></div>
                                 <Button size="sm" variant="outline" onClick={() => start(FEATURE[r.key].step)}>가기<ArrowRight /></Button>
                               </div>
                             ))}
@@ -237,7 +237,7 @@ export default function TriageAssistant() {
                   )
                 })()}
                 {state.procedure && (
-                  <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-[13px] leading-relaxed text-amber-950">
+                  <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm leading-relaxed text-amber-950">
                     <div className="flex items-center gap-1.5 font-semibold"><Scale className="size-4" /> HoLab 기능 밖의 절차</div>
                     <p className="mt-1">{state.procedure}</p>
                     <p className="mt-1 text-amber-900/80">검색된 법령 원문을 근거로 한 안내예요. 구체적인 절차는 고용노동부 1350이나 상담 센터·노무사에게 확인하세요.</p>
@@ -248,7 +248,7 @@ export default function TriageAssistant() {
 
             {state?.rag?.used && (legalBusy || legalConsult.length > 0) && <LegalIssues issues={legalConsult} loading={legalBusy} heading={state.citationsTentative ? '해당될 수 있는 법 조항 (잠정) · 눌러서 자세히 보기' : '해당될 수 있는 법 조항 · 눌러서 자세히 보기'} openFirst />}
             {state && !state.rag?.used && (state.citations?.length ?? 0) > 0 && <div className="rounded-xl bg-accent p-4 text-sm text-muted-foreground">AI가 기억으로 쓴 조문(확인되지 않음): {state.citations!.join(', ')}</div>}
-            {hasPanel && <p className="text-[13px] text-muted-foreground">위 내용은 말씀하신 내용만 근거라 “해당될 수 있어요”로 안내해요. 계약서 같은 확실한 자료를 올리면 더 정확히 알려 드려요.</p>}
+            {hasPanel && <p className="text-sm text-muted-foreground">위 내용은 말씀하신 내용만 근거라 “해당될 수 있어요”로 안내해요. 계약서 같은 확실한 자료를 올리면 더 정확히 알려 드려요.</p>}
           </aside>
         </div>
       </main>

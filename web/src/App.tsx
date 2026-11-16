@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import ComplaintDoc from '@/components/ComplaintDoc'
 import HelpPage from '@/components/HelpPage'
-import Home from '@/components/Home'
+import Home, { AboutPage } from '@/components/Home'
 import PrivacyConsent from '@/components/PrivacyConsent'
 import TriageAssistant from '@/components/TriageAssistant'
 import ReportDoc from '@/components/ReportDoc'
@@ -16,13 +16,14 @@ function Shell() {
     <>
       <div id="app-root" className="relative min-h-dvh">
         <div className="relative z-10">
-        <div className="sticky top-0 z-30 flex min-h-10 items-center justify-center gap-2 border-b border-amber-200 bg-amber-50 px-3 py-1.5 text-center text-[13px] text-amber-950">
+        <div className="sticky top-0 z-30 flex min-h-10 items-center justify-center gap-2 border-b border-amber-200 bg-amber-50 px-3 py-1.5 text-center text-sm text-amber-950">
           <Scale className="size-4 shrink-0" />
           <span>이 서비스는 <b>참고용 정보</b>이며 <b>법률 자문이 아닙니다</b>. 중요한 결정은 노무사·노동청과 상담하세요.</span>
           <PrivacyConsent />
         </div>
         {view === 'home' && <Home />}
         {view === 'help' && <HelpPage />}
+        {view === 'about' && <AboutPage />}
         {view === 'wizard' && <Wizard />}
         <TriageAssistant />
         </div>

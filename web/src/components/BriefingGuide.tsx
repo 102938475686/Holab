@@ -49,7 +49,7 @@ function Bubble({ onLaw }: { onLaw: () => void }) {
               <p className="pt-1">{here
                 ? <>지금 보고 계신 <b>{nextRec.label}</b>{iGa(nextRec.label)} 바로 추천이에요!</>
                 : <>다음엔 <b>{nextRec.label}</b>{eulReul(nextRec.label)} 해 보면 좋겠어요.</>}</p>
-              <p className="rounded-lg bg-primary/5 p-2.5 text-[13px]"><b>왜냐하면</b> {nextRec.reason} <span className="text-muted-foreground">({nextRec.from} 기준)</span></p>
+              <p className="rounded-lg bg-primary/5 p-2.5 text-sm"><b>왜냐하면</b> {nextRec.reason} <span className="text-muted-foreground">({nextRec.from} 기준)</span></p>
               {!here && <Button size="sm" onClick={() => go(nextRec.step)}>{nextRec.label} 하러 가기 <ArrowRight /></Button>}
             </>
           )}
@@ -103,7 +103,7 @@ export default function BriefingGuide({ mode }: { mode: 'rail' | 'float' }) {
           {unread && <span className="absolute right-3 top-1 size-4 rounded-full border-2 border-background bg-red-600 animate-pulse" aria-hidden="true" />}
         </button>
         {!open && (
-          <p className="text-center text-[13px] text-muted-foreground">
+          <p className="text-center text-sm text-muted-foreground">
             {unread ? <b className="text-red-600">새 안내가 있어요</b> : '올랍이를 눌러 보세요'}
           </p>
         )}
