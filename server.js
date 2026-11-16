@@ -93,6 +93,13 @@ function fallbackDraft(f) {
 }
 // ---------- 라우팅 ----------
 async function readBody(req, max = 2e6) {
+  // Vercel은 본문을 미리 읽어 req.body에 넣어 둠
+  if (process.env.VERCEL && req.body !== undefined) {
+    const b = req.body;
+    if (b == null || b === '') return {};
+    if (Buffer.isBuffer(b)) return JSON.parse(b.toString('utf8') || '{}');
+    return typeof b === 'string' ? JSON.parse(b) : b;
+  }
   return new Promise((resolve, reject) => {
     let size = 0; const chunks = [];
     req.on('data', (c) => { size += c.length; if (size > max) { reject(new Error('too large')); req.destroy(); } else chunks.push(c); });
@@ -532,7 +539,8 @@ async function sendComplaintMail({ lawyer = {}, receipt = '', fields = {}, body 
   }
   return { to: maskEmail(to) };
 }
-const server = http.createServer(async (req, res) => {
+// 요청 처리 함수: 로컬·Render에서는 아래 http 서버가, Vercel에서는 api/index.js가 이 함수를 불러요
+async function handler(req, res) {
   try {
     if (req.method === 'GET' && req.url.startsWith('/api/law?')) {
       const ref = parseLawRef(new URL(req.url, 'http://x').searchParams.get('ref') || '');
@@ -894,7 +902,11 @@ const server = http.createServer(async (req, res) => {
     console.error(e);
     send(res, 500, { error: '서버 오류' });
   }
-});
+}
 
-server.listen(PORT, () => console.log(`HoLab! 실행 중: http://localhost:${PORT}  (AI: ${hasKey() ? MODEL : '키 없음 → 대체 응답 모드'})`));
+module.exports = handler;
+// node server.js 로 직접 실행할 때만 서버를 띄움 (Vercel은 handler만 가져다 씀)
+if (require.main === module) {
+  http.createServer(handler).listen(PORT, () => console.log(`HoLab! 실행 중: http://localhost:${PORT}  (AI: ${hasKey() ? MODEL : '키 없음 → 대체 응답 모드'})`));
+}
 
