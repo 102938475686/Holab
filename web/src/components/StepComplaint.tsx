@@ -17,10 +17,11 @@ import { calcIssues, clauseIssues, dedupeIssues, verdictOf } from '@/lib/legal'
 import { savePdf } from '@/lib/pdf'
 import { EVIDENCE_ALT, evidenceList, type Evidence } from '@/lib/evidence'
 import { useStore } from '@/store'
+import Term from '@/components/Term'
 
 const SUBS = ['진정인', '사업장', '진정 내용', '내용 작성', '최종 확인']
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: React.ReactNode; children: React.ReactNode }) {
   return (
     <div className="grid gap-3">
       <h3 className="border-b-2 border-primary pb-1.5 font-semibold">{title}</h3>
@@ -198,7 +199,7 @@ export default function StepComplaint() {
           </div>
         )}
 
-        {sub === 1 && <Section title="1. 진정인">
+        {sub === 1 && <Section title={<>1. <Term k="진정인" /> <span className="font-normal text-muted-foreground">(나)</span></>}>
           <TextField k="pName" label="성명" />
           <TextField k="pRrn" label="주민등록번호" placeholder="000000-0000000" />
           <TextField k="pAddr" label="주소" className="sm:col-span-2" />
@@ -209,7 +210,7 @@ export default function StepComplaint() {
           <ChoiceField k="pPortal" label="노동포털 통지여부" options={['예', '아니오']} />
         </Section>}
 
-        {sub === 2 && <Section title="2. 피진정인">
+        {sub === 2 && <Section title={<>2. <Term k="피진정인" /> <span className="font-normal text-muted-foreground">(사장님·회사)</span></>}>
           <TextField k="rBoss" label="성명 (대표자)" />
           <TextField k="rTel" label="연락처" />
           <TextField k="rAddr" label="주소" className="sm:col-span-2" />

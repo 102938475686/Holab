@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { ArrowRight, CircleHelp, Sparkles, X, XCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
@@ -11,24 +11,25 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Field } from '@/components/common'
 import { judgeCalc, type JudgeReply } from '@/lib/api'
 import LegalIssues from '@/components/LegalIssues'
+import Term from '@/components/Term'
 import JudgmentCard, { type JudgmentChip } from '@/components/JudgmentCard'
 import { calcIssues } from '@/lib/legal'
 import { MIN_WAGE, WEEKS_PER_MONTH as WPM, won, type CalcInput, type CalcResult } from '@/lib/calc'
 import { useStore } from '@/store'
 
-const NUM_FIELDS: [keyof CalcInput, string, string, string][] = [
+const NUM_FIELDS: [keyof CalcInput, ReactNode, string, string][] = [
   ['hourly', '시급 (원)', '예: 10320', '계약서·급여명세서 기준'],
-  ['weekly', '주 근로시간 (계약)', '예: 20', '휴게·연장 시간 제외, 일하기로 정한 시간'],
+  ['weekly', <>주 <Term k="소정근로시간">근로시간</Term> (계약)</>, '예: 20', '휴게·연장 시간 제외, 일하기로 정한 시간'],
   ['months', '일한 기간 (개월)', '예: 3', '대략이어도 돼요'],
-  ['ot', '주당 연장 시간', '없으면 비움', ''],
-  ['night', '주당 야간 시간 (22~06시)', '없으면 비움', ''],
-  ['hol', '주당 휴일 근로 시간', '없으면 비움', ''],
-  ['missedWeeks', '결근한 주 (주 수)', '없으면 0', '하루라도 통째로 빠진 주'],
+  ['ot', <>주당 <Term k="연장근로">연장</Term> 시간</>, '없으면 비움', ''],
+  ['night', <>주당 <Term k="야간근로">야간</Term> 시간 (22~06시)</>, '없으면 비움', ''],
+  ['hol', <>주당 <Term k="휴일근로">휴일 근로</Term> 시간</>, '없으면 비움', ''],
+  ['missedWeeks', <>결근한 주 (주 수)</>, '없으면 0', '하루라도 빠져서 개근하지 못한 주'],
 ]
-const CHECKS: [keyof CalcInput, string, string?][] = [
-  ['under5', '상시 근로자 5인 미만', '사장님 포함 5명이 안 되면 체크'],
-  ['holidayPaid', '주휴수당을 받고 있음', '명세서에 "주휴수당" 항목이 따로 있을 때만 체크. "시급에 포함"이라는 말만 들었다면 체크하지 마세요.'],
-  ['extraPaid', '가산수당을 받고 있음', '연장·야간·휴일 수당이 명세서에 따로 있을 때만 체크'],
+const CHECKS: [keyof CalcInput, string, string?, ReactNode?][] = [
+  ['under5', '상시 근로자 5인 미만', '사장님을 뺀, 일하는 사람(알바 포함) 수가 평균 5명이 안 되면 체크', <><Term k="상시근로자">상시 근로자</Term> 5인 미만</>],
+  ['holidayPaid', '주휴수당을 받고 있음', '명세서에 "주휴수당" 항목이 따로 있을 때만 체크. "시급에 포함"이라는 말만 들었다면 체크하지 마세요.', <><Term k="주휴수당" />을 받고 있음</>],
+  ['extraPaid', '가산수당을 받고 있음', '연장·야간·휴일 수당이 명세서에 따로 있을 때만 체크', <><Term k="가산수당" />을 받고 있음</>],
 ]
 
 // 금액이 0에서 올라가며 나타남 (모션 줄이기 설정이면 바로 표시)
@@ -205,12 +206,12 @@ export default function StepCalc() {
             </Field>
           ))}
         </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {CHECKS.map(([k, label, help]) => (
+        <div className="grid gap-3">
+          {CHECKS.map(([k, label, help, rich]) => (
             <div key={k} className="grid gap-1.5">
               <div className="flex items-center gap-2.5">
                 <Checkbox id={`c-${k}`} checked={calcIn[k] as boolean} onCheckedChange={(v) => setCalcIn({ [k]: !!v })} />
-                <Label htmlFor={`c-${k}`} className="cursor-pointer font-normal">{label}</Label>
+                <Label htmlFor={`c-${k}`} className="cursor-pointer font-normal">{rich ?? label}</Label>
                 {help && (
                   <button type="button" aria-label={`${label} 설명 보기`} onClick={() => setHelpOpen((v) => (v === k ? null : k))} className="text-muted-foreground hover:text-foreground">
                     <CircleHelp className="size-4" />
@@ -255,7 +256,7 @@ export default function StepCalc() {
                 <p className="text-3xl font-extrabold text-emerald-700">미지급 추정액 없음</p>
               )}
               <p className="mt-4 text-sm leading-relaxed">{summarySentence(calc)}</p>
-              {bad && <p className="mt-1 text-sm text-muted-foreground">임금채권 소멸시효는 3년이에요.</p>}
+              {bad && <p className="mt-1 text-sm text-muted-foreground">못 받은 임금의 <Term k="소멸시효" />는 3년이에요.</p>}
             </div>
 
             {extraCount === 0 && (

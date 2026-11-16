@@ -10,7 +10,7 @@ import { SAMPLES } from '@/lib/sample'
 import { useStore } from '@/store'
 import logo from '@/assets/logo.png'
 
-// 기능은 순서대로 하는 단계가 아니라, 상황에 맞게 골라 쓰는 메뉴예요(번호 없이 아이콘으로 구분)
+// 기능은 ①→④ 번호가 붙은 진행 표시줄로 보여 주지만, 상황에 맞게 아무 단계나 골라 쓸 수 있어요
 const FEATURES = [
   { n: 1, label: '못 받은 돈 확인', hint: '받아야 할 돈 계산', icon: Calculator },
   { n: 2, label: '계약서 분석', hint: '위험 조항 점검', icon: BookOpen },
@@ -24,9 +24,8 @@ const WRAP = 'mx-auto w-full max-w-[76rem] px-4 2xl:max-w-[94rem] sm:px-6'
 export default function Wizard() {
   const { step, go, done, setView, loadSample, ai, recommended, nextRec } = useStore()
   // 추천 표시: AI 상담이 정한 순위가 있으면 "추천 N순위", 없으면 판단 카드가 가리킨 "다음 추천"
-  // 추천이 뜨면 추천 순서대로 앞에 놓고, 나머지는 원래 순서대로 뒤에 둠
-  const rankOrder = [...recommended, ...(nextRec && !recommended.includes(nextRec.step) ? [nextRec.step] : [])]
-  const ordered = [...FEATURES].sort((a, b) => { const ra = rankOrder.indexOf(a.n), rb = rankOrder.indexOf(b.n); return (ra < 0 ? 99 : ra) - (rb < 0 ? 99 : rb) || a.n - b.n })
+  // 진행 표시줄: 순서는 ①→④로 고정하고, 해 본 단계는 ✓, 추천 단계는 "추천" 글자로 알려 줌 (순서대로 안 해도 됨)
+  const doneN = FEATURES.filter((f) => done.includes(f.n)).length
   const recLabel = (n: number) => {
     const i = recommended.indexOf(n)
     if (i >= 0) return `추천 ${i + 1}순위`
@@ -59,21 +58,32 @@ export default function Wizard() {
         <aside className="hidden lg:block" aria-label="HoLab 안내"><div className="sticky top-14"><BriefingGuide mode="rail" /></div></aside>
         <div className="min-w-0">
         <Tabs value={String(step)} onValueChange={(v) => go(Number(v))} className="gap-5">
+          <div className="grid gap-2" aria-live="polite">
+            <div className="flex items-center justify-between gap-3 text-sm">
+              <span className="font-semibold">4단계 중 <b className="text-primary">{doneN}단계</b> 해 봤어요</span>
+              <span className="text-muted-foreground">순서대로 안 해도 괜찮아요</span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-muted" role="progressbar" aria-valuemin={0} aria-valuemax={4} aria-valuenow={doneN} aria-label="진행 상황">
+              <div className="h-full rounded-full bg-primary transition-[width] duration-500" style={{ width: `${(doneN / 4) * 100}%` }} />
+            </div>
+          </div>
           <TabsList aria-label="기능 선택" className="grid h-auto! w-full grid-cols-2 gap-2 rounded-none bg-transparent p-0 sm:grid-cols-4 group-data-horizontal/tabs:h-auto">
-            {ordered.map((f) => {
+            {FEATURES.map((f) => {
               const rec = recLabel(f.n)
               const isDone = done.includes(f.n)
               return (
                 <TabsTrigger
                   key={f.n}
                   value={String(f.n)}
-                  aria-label={f.label}
+                  aria-label={`${f.n}단계 ${f.label}${isDone ? ' (해 봤어요)' : ''}`}
                   className="group/tab h-auto min-w-0 flex-none flex-col items-start justify-start gap-1 rounded-xl border-transparent bg-accent px-4 py-3 text-left text-base font-bold text-foreground after:hidden hover:bg-primary/10 data-active:bg-primary data-active:text-primary-foreground"
                 >
                   <span className="flex w-full items-center gap-2">
-                    <f.icon className="size-5 shrink-0" />
-                    <span className="truncate">{f.label}</span>
-                    {isDone && <Check className="ml-auto size-4 shrink-0" strokeWidth={3} aria-label="해 봤어요" />}
+                    <span className={`flex size-7 shrink-0 items-center justify-center rounded-full text-sm font-extrabold ${isDone ? 'bg-emerald-600 text-white' : 'bg-primary/15 text-primary group-data-active/tab:bg-white group-data-active/tab:text-primary'}`}>
+                      {isDone ? <Check className="size-4" strokeWidth={3} /> : f.n}
+                    </span>
+                    <f.icon className="hidden size-5 shrink-0 2xl:block" />
+                    <span className="min-w-0 leading-snug">{f.label}</span>
                   </span>
                   <span className={`truncate text-sm font-medium ${rec ? 'text-primary group-data-active/tab:text-white' : 'text-foreground/70 group-data-active/tab:text-white/90'}`}>{rec || f.hint}</span>
                 </TabsTrigger>
