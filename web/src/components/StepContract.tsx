@@ -302,15 +302,23 @@ function AnalysisView({ a, onDispute, onRemove }: { a: Analysis; onDispute: () =
       </div>
       {a.summary && <p className="text-base leading-relaxed">{a.summary}</p>}
       {a.clauses.length === 0 && <p className="text-sm text-muted-foreground">문제 소지가 있는 조항이 발견되지 않았습니다.</p>}
-      {sorted.map(({ c, i }) => {
+      {sorted.length > 0 && sorted[0].c.severity === 'high' && sorted.some(({ c }) => c.severity !== 'high') && (
+        <p className="text-sm text-muted-foreground">“위험” 조항은 펼쳐 두었어요. 주의·참고 조항은 제목을 누르면 자세히 볼 수 있어요.</p>
+      )}
+      {sorted.map(({ c, i }, idx) => {
         const lv = c.evidence || c.lawText ? '근거 충분' : a.rag?.used ? '현재 정보로 판단 어려움' : '추가 확인 필요'
-        return (
-          <div key={i} className={`grid gap-3 rounded-xl border border-l-4 p-4 ${c.severity === 'high' ? 'border-l-destructive' : c.severity === 'medium' ? 'border-l-amber-500' : 'border-l-slate-400'}`}>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className={`rounded-full px-2.5 py-0.5 text-sm font-bold ${(SEV[c.severity] ?? SEV.low).cls}`}>{(SEV[c.severity] ?? SEV.low).label}</span>
-              <b className="text-base">{c.title}</b>
-              <Badge variant="outline" className="ml-auto">{lv}</Badge>
-            </div>
+        // 위험 조항은 펼쳐서, 주의·참고는 접어서 보여 줌 (위험이 하나도 없으면 첫 조항만 펼침)
+        const open = c.severity === 'high' || (idx === 0 && sorted[0].c.severity !== 'high')
+        const cls = `grid gap-3 rounded-xl border border-l-4 p-4 ${c.severity === 'high' ? 'border-l-destructive' : c.severity === 'medium' ? 'border-l-amber-500' : 'border-l-slate-400'}`
+        const head = (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={`rounded-full px-2.5 py-0.5 text-sm font-bold ${(SEV[c.severity] ?? SEV.low).cls}`}>{(SEV[c.severity] ?? SEV.low).label}</span>
+            <b className="text-base">{c.title}</b>
+            {open ? <Badge variant="outline" className="ml-auto">{lv}</Badge> : <span className="ml-auto text-sm font-medium text-primary group-open/clause:hidden">자세히 보기 ▾</span>}
+          </div>
+        )
+        const rest = (
+          <>
             {c.quote && (
               <div>
                 <p className="text-sm font-semibold text-muted-foreground">계약서에 적힌 문장</p>
@@ -348,8 +356,16 @@ function AnalysisView({ a, onDispute, onRemove }: { a: Analysis; onDispute: () =
               </AccordionItem>
             </Accordion>
             <Button variant="ghost" size="sm" className="h-auto justify-self-start px-0 text-sm text-muted-foreground" onClick={() => onRemove(i)}>이 지적이 맞지 않아요 (빼기)</Button>
-          </div>
+          </>
         )
+        return open
+          ? <div key={i} className={cls}>{head}{rest}</div>
+          : (
+            <details key={i} className={`group/clause ${cls}`}>
+              <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">{head}</summary>
+              {rest}
+            </details>
+          )
       })}
       {!!a.missing?.length && (
         <div className="grid gap-2">

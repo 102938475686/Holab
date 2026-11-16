@@ -154,6 +154,12 @@ export default function StepCalc() {
     setUnknown(next)
   }
   const unknownLabels = CHECKS.filter(([k]) => unknown.has(k)).map(([, l]) => l)
+  // 처음엔 꼭 필요한 3칸만 보여 주고, 연장·야간·휴일·결근·5인 미만·수당은 "더 정확하게 계산하기"에 접어 둠
+  const BASIC = NUM_FIELDS.slice(0, 3)
+  const EXTRA = NUM_FIELDS.slice(3)
+  const extraCount = EXTRA.filter(([k]) => +(calcIn[k] as string) > 0).length + CHECKS.filter(([k]) => calcIn[k] === true || unknown.has(k)).length
+  const [more, setMore] = useState(extraCount > 0)
+  useEffect(() => { if (extraCount > 0) setMore(true) }, [extraCount]) // 샘플·AI 상담으로 추가 조건이 채워지면 자동으로 펼침
 
   return (
     <Card>
@@ -172,7 +178,27 @@ export default function StepCalc() {
         )}
         <NoAmountHelp onHourly={(v) => setCalcIn({ hourly: String(v) })} />
         <div className="grid gap-4 sm:grid-cols-3">
-          {NUM_FIELDS.map(([k, label, ph, hint]) => (
+          {BASIC.map(([k, label, ph, hint]) => (
+            <Field key={k} label={<>{label} <span className="text-destructive" aria-label="필수">*</span></>}>
+              <Input type="number" min={0} step="any" value={calcIn[k] as string} placeholder={ph} onChange={(e) => setCalcIn({ [k]: e.target.value })} />
+              {hint && <p className="text-sm text-muted-foreground">{hint}</p>}
+            </Field>
+          ))}
+        </div>
+        <button
+          type="button" aria-expanded={more} onClick={() => setMore((v) => !v)}
+          className="flex w-full items-center gap-2 rounded-xl border bg-muted/40 px-4 py-3 text-left font-semibold transition-colors hover:bg-muted"
+        >
+          <span className="flex-1">
+            더 정확하게 계산하기 <span className="font-normal text-muted-foreground">(선택)</span>
+            <span className="block text-sm font-normal text-muted-foreground">연장·야간·휴일 근무, 결근한 주, 5인 미만 사업장, 받은 수당</span>
+          </span>
+          {extraCount > 0 && <Badge variant="secondary">{extraCount}개 입력됨</Badge>}
+          <span className="text-sm font-medium text-primary">{more ? '접기 ▴' : '펼치기 ▾'}</span>
+        </button>
+        {more && (<>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {EXTRA.map(([k, label, ph, hint]) => (
             <Field key={k} label={label}>
               <Input type="number" min={0} step="any" value={calcIn[k] as string} placeholder={ph} onChange={(e) => setCalcIn({ [k]: e.target.value })} />
               {hint && <p className="text-sm text-muted-foreground">{hint}</p>}
@@ -208,6 +234,7 @@ export default function StepCalc() {
             </div>
           ))}
         </div>
+        </>)}
         <div>
           {/* 계산 전엔 주요 버튼, 계산 후엔 아래 "다음 단계" 버튼에 주요 자리를 넘기고 보조로 낮춤(한 화면에 파란 버튼 1개만) */}
           <Button variant={calc ? 'outline' : 'default'} onClick={() => { if (!runCalc()) alert('시급과 주 근로시간을 입력하세요.') }}>
@@ -217,6 +244,7 @@ export default function StepCalc() {
 
         {calc && (
           <div className="grid gap-4">
+            {/* 결과는 "큰 숫자 하나 + 다음 행동 버튼 하나". 계산 내역·법 조항·실제 받은 돈 비교는 접어 둠 */}
             <div className={`rounded-xl border p-5 ${bad ? 'border-destructive/30 bg-destructive/5' : 'border-emerald-400/30 bg-emerald-500/10'}`}>
               {bad ? (
                 <>
@@ -230,57 +258,54 @@ export default function StepCalc() {
               {bad && <p className="mt-1 text-sm text-muted-foreground">임금채권 소멸시효는 3년이에요.</p>}
             </div>
 
-            {(() => {
-              const rec = +calcIn.received || 0
-              const monthlyFill = Math.round(calc.hourly * calc.weekly * WPM)
-              const showTotal = calc.months > 0
-              const recTotal = rec * calc.months
-              const shortM = Math.max(0, calc.monthlyDue - rec)
-              const shortT = Math.max(0, calc.totalDue - recTotal)
-              const short = (v: number) => (v > 0 ? <span className="font-bold text-destructive">{won(v)}</span> : '부족분 없음')
-              return (
-                <div className="grid gap-3 rounded-xl border p-4">
-                  <div>
-                    <h4 className="flex flex-wrap items-center gap-2 text-sm font-semibold">실제로 받은 금액과 비교해 볼까요? <Badge variant="secondary">선택</Badge></h4>
-                    <p className="mt-0.5 text-sm text-muted-foreground">한 달 평균 세전 금액을 적으면 나란히 비교해요.</p>
-                  </div>
-                  <div className="flex flex-wrap items-end gap-2">
-                    <div className="grid w-full max-w-xs gap-1.5">
-                      <Label htmlFor="received">실제로 받은 급여 (한 달 평균, 세전, 원)</Label>
-                      <Input id="received" type="number" min={0} step="any" value={calcIn.received ?? ''} placeholder="예: 1238325" onChange={(e) => setCalcIn({ received: e.target.value })} />
-                    </div>
-                    <Button variant="outline" size="sm" onClick={() => setCalcIn({ received: String(monthlyFill) })}>계약 시급({calc.hourly.toLocaleString()}원)대로 받은 경우로 채우기 · {won(monthlyFill)}</Button>
-                  </div>
-                  {rec > 0 && (
-                    <>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>구분</TableHead>
-                            <TableHead className="text-right">한 달 평균</TableHead>
-                            {showTotal && <TableHead className="text-right">{calc.months}개월 합계</TableHead>}
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          <TableRow><TableCell>법적으로 받아야 할 급여</TableCell><TableCell className="text-right">{won(calc.monthlyDue)}</TableCell>{showTotal && <TableCell className="text-right">{won(calc.totalDue)}</TableCell>}</TableRow>
-                          <TableRow><TableCell>실제로 받은 급여</TableCell><TableCell className="text-right">{won(rec)}</TableCell>{showTotal && <TableCell className="text-right">{won(recTotal)}</TableCell>}</TableRow>
-                          <TableRow className="font-bold"><TableCell>= 부족한 금액</TableCell><TableCell className="text-right">{short(shortM)}</TableCell>{showTotal && <TableCell className="text-right">{short(shortT)}</TableCell>}</TableRow>
-                        </TableBody>
-                      </Table>
-                      {showTotal && Math.abs(shortT - calc.total) > 1000 && (
-                        <p className="text-sm text-muted-foreground">위 부족액은 실제 입금 기준이고, 항목별 계산(주휴수당·최저임금 차액 등)은 {won(calc.total)}이에요. 차이가 크면 급여명세서의 항목별 금액을 확인해 보세요.</p>
-                      )}
-                    </>
-                  )}
-                </div>
-              )
-            })()}
+            {extraCount === 0 && (
+              <p className="text-sm text-muted-foreground">연장·야간·휴일 근무나 결근한 주가 있었다면 위의 <button type="button" className="font-semibold text-primary underline underline-offset-2" onClick={() => setMore(true)}>더 정확하게 계산하기</button>에 넣어 주세요. 지금 결과에는 반영되지 않았어요.</p>
+            )}
             {unknownLabels.length > 0 && (
               <Alert><CircleHelp /><AlertDescription>추가 확인 필요: {unknownLabels.join(', ')} 항목은 “잘 모르겠어요”로 두고 계산했어요. 급여명세서나 계약서로 확인하면 결과가 더 정확해져요.</AlertDescription></Alert>
             )}
+            {(() => {
+              const rule = judge(calc)
+              const STEP = { contract: { n: 2, label: '계약서 분석' }, complaint: { n: 3, label: '진정서 작성' }, lawyer: { n: 4, label: '노무사 상담' } } as const
+              const key = aiJudge?.recommend?.key ?? 'contract'
+              const reason = aiJudge?.recommend?.reason || rule.reason
+              const chips: JudgmentChip[] = []
+              if (calc.total > 0) chips.push({ label: '못 받은 돈', value: won(calc.total), tone: 'bad' })
+              if (calc.holUnpaid > 0) chips.push({ label: '주휴수당', value: won(calc.holUnpaid), tone: 'bad' })
+              if (calc.minWageUnpaid > 0) chips.push({ label: '최저임금 차액', value: won(calc.minWageUnpaid), tone: 'bad' })
+              if (calc.extraUnpaid > 0) chips.push({ label: '가산수당', value: won(calc.extraUnpaid), tone: 'bad' })
+              if (!chips.length) chips.push({ label: '미지급', value: '없음', tone: 'ok' })
+              return (
+                <JudgmentCard
+                  loading={judging} ai={!!aiJudge}
+                  headline={`${STEP[key].label}으로 이어가세요`}
+                  action={`${STEP[key].label}으로 가기`} onAction={() => go(STEP[key].n)}
+                  reason={reason} chips={chips.slice(0, 3)}
+                  extra={key !== 'complaint' && bad ? <Button variant="ghost" size="sm" onClick={() => go(3)}>바로 진정서 작성</Button> : undefined}
+                >
+                  {aiJudge?.summary && <p>{aiJudge.summary}</p>}
+                  {rule.facts.length > 0 && <ul className="list-disc space-y-1 pl-5 text-muted-foreground">{rule.facts.map((f) => <li key={f}>{f}</li>)}</ul>}
+                </JudgmentCard>
+              )
+            })()}
 
             <details className="group rounded-xl border p-4">
-              <summary className="cursor-pointer text-sm font-semibold">왜 이렇게 계산됐나요?</summary>
+              <summary className="cursor-pointer font-semibold">왜 이 금액인가요? <span className="font-normal text-muted-foreground">계산 내역 · 관련 법 조항</span></summary>
+              <div className="mt-3 grid gap-4">
+            {bad && (
+              <div className="grid gap-2">
+                <h4 className="text-sm font-semibold text-muted-foreground">그중 아직 못 받은 것으로 보이는 금액</h4>
+                <Table>
+                  <TableHeader><TableRow><TableHead>미지급 항목</TableHead><TableHead className="text-right">금액</TableHead></TableRow></TableHeader>
+                  <TableBody>
+                    {calc.holUnpaid > 0 && <TableRow><TableCell className="flex items-center gap-1.5"><XCircle className="size-3.5 text-destructive" /> 주휴수당</TableCell><TableCell className="text-right text-destructive">{won(calc.holUnpaid)}</TableCell></TableRow>}
+                    {calc.extraUnpaid > 0 && <TableRow><TableCell className="flex items-center gap-1.5"><XCircle className="size-3.5 text-destructive" /> 가산수당</TableCell><TableCell className="text-right text-destructive">{won(calc.extraUnpaid)}</TableCell></TableRow>}
+                    {calc.minWageUnpaid > 0 && <TableRow><TableCell className="flex items-center gap-1.5"><XCircle className="size-3.5 text-destructive" /> 최저임금 차액</TableCell><TableCell className="text-right text-destructive">{won(calc.minWageUnpaid)}</TableCell></TableRow>}
+                    <TableRow className="font-bold"><TableCell>합계</TableCell><TableCell className="text-right">{won(calc.total)}</TableCell></TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+            )}
             <div className="mt-3 grid gap-2">
               <h4 className="text-sm font-semibold text-muted-foreground">법정 기준으로 계산한 급여 구성 (아래 항목을 다 더하면 받아야 할 급여가 돼요)</h4>
               {(() => {
@@ -312,49 +337,58 @@ export default function StepCalc() {
                 )
               })()}
             </div>
+              <LegalIssues issues={calcIssues(calc, masked || pasteText, analysis)} heading="관련 법 조항 · 입력하신 내용 기준" />
+
+              </div>
             </details>
 
-            {bad && (
-              <div className="grid gap-2">
-                <h4 className="text-sm font-semibold text-muted-foreground">그중 아직 못 받은 것으로 보이는 금액</h4>
-                <Table>
-                  <TableHeader><TableRow><TableHead>미지급 항목</TableHead><TableHead className="text-right">금액</TableHead></TableRow></TableHeader>
-                  <TableBody>
-                    {calc.holUnpaid > 0 && <TableRow><TableCell className="flex items-center gap-1.5"><XCircle className="size-3.5 text-destructive" /> 주휴수당</TableCell><TableCell className="text-right text-destructive">{won(calc.holUnpaid)}</TableCell></TableRow>}
-                    {calc.extraUnpaid > 0 && <TableRow><TableCell className="flex items-center gap-1.5"><XCircle className="size-3.5 text-destructive" /> 가산수당</TableCell><TableCell className="text-right text-destructive">{won(calc.extraUnpaid)}</TableCell></TableRow>}
-                    {calc.minWageUnpaid > 0 && <TableRow><TableCell className="flex items-center gap-1.5"><XCircle className="size-3.5 text-destructive" /> 최저임금 차액</TableCell><TableCell className="text-right text-destructive">{won(calc.minWageUnpaid)}</TableCell></TableRow>}
-                    <TableRow className="font-bold"><TableCell>합계</TableCell><TableCell className="text-right">{won(calc.total)}</TableCell></TableRow>
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-
+            <details className="group rounded-xl border p-4">
+              <summary className="cursor-pointer font-semibold">실제로 받은 돈과 비교해 보기 <span className="font-normal text-muted-foreground">(선택)</span></summary>
+              <div className="mt-3">
             {(() => {
-              const rule = judge(calc)
-              const STEP = { contract: { n: 2, label: '계약서 분석' }, complaint: { n: 3, label: '진정서 작성' }, lawyer: { n: 4, label: '노무사 상담' } } as const
-              const key = aiJudge?.recommend?.key ?? 'contract'
-              const reason = aiJudge?.recommend?.reason || rule.reason
-              const chips: JudgmentChip[] = []
-              if (calc.total > 0) chips.push({ label: '못 받은 돈', value: won(calc.total), tone: 'bad' })
-              if (calc.holUnpaid > 0) chips.push({ label: '주휴수당', value: won(calc.holUnpaid), tone: 'bad' })
-              if (calc.minWageUnpaid > 0) chips.push({ label: '최저임금 차액', value: won(calc.minWageUnpaid), tone: 'bad' })
-              if (calc.extraUnpaid > 0) chips.push({ label: '가산수당', value: won(calc.extraUnpaid), tone: 'bad' })
-              if (!chips.length) chips.push({ label: '미지급', value: '없음', tone: 'ok' })
+              const rec = +calcIn.received || 0
+              const monthlyFill = Math.round(calc.hourly * calc.weekly * WPM)
+              const showTotal = calc.months > 0
+              const recTotal = rec * calc.months
+              const shortM = Math.max(0, calc.monthlyDue - rec)
+              const shortT = Math.max(0, calc.totalDue - recTotal)
+              const short = (v: number) => (v > 0 ? <span className="font-bold text-destructive">{won(v)}</span> : '부족분 없음')
               return (
-                <JudgmentCard
-                  loading={judging} ai={!!aiJudge}
-                  headline={`${STEP[key].label}으로 이어가세요`}
-                  action={`${STEP[key].label}으로 가기`} onAction={() => go(STEP[key].n)}
-                  reason={reason} chips={chips.slice(0, 3)}
-                  extra={key !== 'complaint' && bad ? <Button variant="ghost" size="sm" onClick={() => go(3)}>바로 진정서 작성</Button> : undefined}
-                >
-                  {aiJudge?.summary && <p>{aiJudge.summary}</p>}
-                  {rule.facts.length > 0 && <ul className="list-disc space-y-1 pl-5 text-muted-foreground">{rule.facts.map((f) => <li key={f}>{f}</li>)}</ul>}
-                </JudgmentCard>
+                <div className="grid gap-3">
+                  <p className="text-sm text-muted-foreground">한 달 평균 세전 금액을 적으면 법적으로 받아야 할 돈과 나란히 비교해요.</p>
+                  <div className="flex flex-wrap items-end gap-2">
+                    <div className="grid w-full max-w-xs gap-1.5">
+                      <Label htmlFor="received">실제로 받은 급여 (한 달 평균, 세전, 원)</Label>
+                      <Input id="received" type="number" min={0} step="any" value={calcIn.received ?? ''} placeholder="예: 1238325" onChange={(e) => setCalcIn({ received: e.target.value })} />
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => setCalcIn({ received: String(monthlyFill) })}>계약 시급({calc.hourly.toLocaleString()}원)대로 받은 경우로 채우기 · {won(monthlyFill)}</Button>
+                  </div>
+                  {rec > 0 && (
+                    <>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>구분</TableHead>
+                            <TableHead className="text-right">한 달 평균</TableHead>
+                            {showTotal && <TableHead className="text-right">{calc.months}개월 합계</TableHead>}
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          <TableRow><TableCell>법적으로 받아야 할 급여</TableCell><TableCell className="text-right">{won(calc.monthlyDue)}</TableCell>{showTotal && <TableCell className="text-right">{won(calc.totalDue)}</TableCell>}</TableRow>
+                          <TableRow><TableCell>실제로 받은 급여</TableCell><TableCell className="text-right">{won(rec)}</TableCell>{showTotal && <TableCell className="text-right">{won(recTotal)}</TableCell>}</TableRow>
+                          <TableRow className="font-bold"><TableCell>= 부족한 금액</TableCell><TableCell className="text-right">{short(shortM)}</TableCell>{showTotal && <TableCell className="text-right">{short(shortT)}</TableCell>}</TableRow>
+                        </TableBody>
+                      </Table>
+                      {showTotal && Math.abs(shortT - calc.total) > 1000 && (
+                        <p className="text-sm text-muted-foreground">위 부족액은 실제 입금 기준이고, 항목별 계산(주휴수당·최저임금 차액 등)은 {won(calc.total)}이에요. 차이가 크면 급여명세서의 항목별 금액을 확인해 보세요.</p>
+                      )}
+                    </>
+                  )}
+                </div>
               )
             })()}
-            <LegalIssues issues={calcIssues(calc, masked || pasteText, analysis)} heading="관련 법 조항 · 입력하신 내용 기준" />
-
+              </div>
+            </details>
           </div>
         )}
       </CardContent>

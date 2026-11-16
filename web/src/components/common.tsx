@@ -7,7 +7,7 @@ import { useStore, type FormState } from '@/store'
 import { cn } from '@/lib/utils'
 
 // auto: 이전 단계 내용으로 자동 작성된 칸이면 출처를 배지로 보여 줌 (사용자가 고치면 사라짐)
-export function Field({ label, children, className, auto }: { label: string; children: ReactNode; className?: string; auto?: string }) {
+export function Field({ label, children, className, auto }: { label: ReactNode; children: ReactNode; className?: string; auto?: string }) {
   return (
     <div className={cn('grid gap-1.5', auto && 'auto-field', className)}>
       <Label className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
