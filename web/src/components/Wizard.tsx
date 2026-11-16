@@ -100,7 +100,7 @@ export default function Wizard() {
         </div>
         <BriefingGuide mode="float" />
       </main>
-      <footer className={`${WRAP} pb-8 text-center text-sm text-muted-foreground`}>HoLab · 1팀 김연우 · 김연호 · 노유승 · 차도현 · SDGs 8.8 노동권 보호</footer>
+      <footer className={`${WRAP} pb-8 text-center text-sm text-muted-foreground`}>HoLab · 1팀 김연호 · 노유승 · 차도현 · SDGs 8.8 노동권 보호</footer>
     </div>
   )
 }

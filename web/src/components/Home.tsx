@@ -165,7 +165,7 @@ function HomeFooter() {
   return (
     <footer className="border-t px-5 py-10 text-center text-sm text-muted-foreground"> {/* taste-skill-ignore: 본문과 푸터를 구분하는 실질적 경계선 */}
       <p>이 서비스는 참고용 정보이며 법률 자문이 아닙니다. 중요한 결정은 노무사·노동청과 상담하세요.</p>
-      <p className="mt-2">HoLab · 1팀 김연우 · 김연호 · 노유승 · 차도현 · SDGs 8.8 노동권 보호</p>
+      <p className="mt-2">HoLab · 1팀 김연호 · 노유승 · 차도현 · SDGs 8.8 노동권 보호</p>
     </footer>
   )
 }
